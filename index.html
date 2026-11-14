@@ -1,0 +1,2254 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>СwЭГ — страны и столицы мира</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Тренажёр по географии: найди страну на карте мира и выбери её столицу.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Literata:opsz,wght@7..72,500;7..72,600;7..72,700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+(function () {
+  var t = window.Telegram && window.Telegram.WebApp, tg = t && t.initData ? t : null;
+  var dark = tg ? tg.colorScheme === 'dark' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  if (tg) document.documentElement.className += ' tg';
+})();
+</script>
+<style>
+:root{
+  --page:#e6eff3; --sea:#d3e5ec; --grid:rgba(48,98,124,.17);
+  --land:#fefdfa; --border:#7f8d98; --hover:#e9f0f3;
+  --ink:#1b3350; --ink2:#5a6c7d; --ink3:#8a99a6;
+  --panel:#ffffff; --panel2:#f3f7f9; --line:#dde6eb;
+  --accent:#1f5fa6; --accent-ink:#ffffff; --accent-soft:#e6eef8;
+  --ok:#23885a; --ok-bg:#e1f3e9; --bad:#c9372f; --bad-bg:#fbe6e4;
+  --target:#e39c00; --star:#d1342b;
+  --p0:#f3c8c3; --p1:#f5e09e; --p2:#cbe4b3; --p3:#d8ceee; --p4:#f5cfa3;
+  --hatch-bg:#fdf0ee; --hatch:#d9655f;
+  --shadow:0 1px 2px rgba(27,51,80,.08),0 10px 30px rgba(27,51,80,.14);
+  --mn-bg:#fff5d4; --mn-mark:#ffd84d; --mn-ico:#a86f00;
+  --cand:#d6e6f8; --cand-h:#b5d1f1;
+  --flag:#ffe07a;
+  --hero-bg:#1f5fa6; --hero-ink:#ffffff; --hero-ink2:rgba(255,255,255,.8); --hero-topo:rgba(255,255,255,.14);
+  --hero-track:rgba(255,255,255,.22); --hero-tile:rgba(255,255,255,.13); --hero-l:#7fe0a9; --hero-w:#ffd36b;
+  --card-shadow:0 1px 2px rgba(27,51,80,.06),0 4px 14px rgba(27,51,80,.05);
+  --serif:"Literata",Georgia,"Times New Roman",serif;
+  --sans:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --page:#08161f; --sea:#0e2332; --grid:rgba(140,185,210,.10);
+  --land:#1b2f3d; --border:#587184; --hover:#24404f;
+  --ink:#e6eef3; --ink2:#a3b5c2; --ink3:#71889a;
+  --panel:#122634; --panel2:#18303f; --line:#26404f;
+  --accent:#6fa8ea; --accent-ink:#0b1c28; --accent-soft:#1c3a52;
+  --ok:#4cc58b; --ok-bg:#163a2a; --bad:#ff6a61; --bad-bg:#45201f;
+  --target:#f4b52c; --star:#ff6a61;
+  --p0:#6e4a4b; --p1:#6a5d36; --p2:#45603f; --p3:#53476f; --p4:#6f5238;
+  --hatch-bg:#3a2224; --hatch:#e0615a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.45);
+  --mn-bg:#2c2a1c; --mn-mark:rgba(244,181,44,.42); --mn-ico:#f4b52c;
+  --cand:#25496b; --cand-h:#2f5d88;
+  --flag:#6b5a1c;
+  --hero-bg:#1b4470; --hero-ink:#eef5fb; --hero-ink2:rgba(238,245,251,.75); --hero-topo:rgba(255,255,255,.1);
+  --hero-track:rgba(255,255,255,.16); --hero-tile:rgba(255,255,255,.08); --hero-l:#6fd69c; --hero-w:#f4c24f;
+  --card-shadow:none;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--page);color:var(--ink);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,label:has(input:focus-visible){outline:2.5px solid var(--accent);outline-offset:2px}
+
+/* ───── карта ───── */
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#map.dragging{cursor:grabbing}
+#sea{fill:var(--sea)}
+#grid{fill:none;stroke:var(--grid);stroke-width:.7px;vector-effect:non-scaling-stroke}
+.c{fill:var(--land);stroke:var(--border);stroke-width:.55px;vector-effect:non-scaling-stroke;stroke-linejoin:round;fill-rule:evenodd;transition:fill .3s}
+body.locate .c:hover{fill:var(--hover)}
+body.locate #map{cursor:pointer}
+.c.done.p0,body.atlas .c.p0{fill:var(--p0)}
+.c.done.p1,body.atlas .c.p1{fill:var(--p1)}
+.c.done.p2,body.atlas .c.p2{fill:var(--p2)}
+.c.done.p3,body.atlas .c.p3{fill:var(--p3)}
+.c.done.p4,body.atlas .c.p4{fill:var(--p4)}
+body.atlas .c.terr{fill:var(--land)}
+body.atlas .c:hover{fill:var(--hover)}
+.c.missed{fill:url(#hatch)}
+.c.flag{fill:var(--flag)}
+.c.target{fill:var(--target)}
+.c.flash-bad{fill:var(--bad)!important;transition:none}
+.c.sel{stroke:var(--ink);stroke-width:1.6px}
+/* режим «из 7 вариантов» */
+body.choice #map{cursor:grab}
+body.choice .c:not(.cand),body.choice .dot:not(.cand){opacity:.32;pointer-events:none;transition:opacity .35s,fill .3s}
+body.choice .c:not(.cand):hover{fill:var(--land)}
+body.choice .c.cand{fill:var(--cand);cursor:pointer}
+body.choice .c.cand:hover{fill:var(--cand-h)}
+body.choice .dot.cand{cursor:pointer}
+body.choice .dot.cand .d{fill:var(--cand);stroke:var(--accent);stroke-width:2.2px}
+body.choice .dot.cand:hover .d{fill:var(--cand-h)}
+#hilite path.cand-ring{stroke:var(--accent);stroke-width:1.6px;animation:none}
+#hilite path{fill:none;stroke:var(--target);stroke-width:3px;vector-effect:non-scaling-stroke;stroke-linejoin:round;pointer-events:none;animation:pulse 1.3s ease-in-out infinite}
+#hilite path.okring{stroke:var(--ok);animation:okring 1s ease-out forwards}
+@keyframes pulse{0%,100%{stroke-opacity:1;stroke-width:3px}50%{stroke-opacity:.35;stroke-width:8px}}
+@keyframes okring{0%{stroke-opacity:1;stroke-width:2px}100%{stroke-opacity:0;stroke-width:14px}}
+#hatch .hb{fill:var(--hatch-bg)} #hatch .hl{stroke:var(--hatch)}
+.dot .hit{fill:transparent}
+.dot .d{fill:var(--land);stroke:var(--border);stroke-width:1.3px;vector-effect:non-scaling-stroke;transition:fill .3s}
+body.locate .dot:hover .d{fill:var(--hover)}
+.dot.done.p0 .d,body.atlas .dot.p0 .d{fill:var(--p0)}
+.dot.done.p1 .d,body.atlas .dot.p1 .d{fill:var(--p1)}
+.dot.done.p2 .d,body.atlas .dot.p2 .d{fill:var(--p2)}
+.dot.done.p3 .d,body.atlas .dot.p3 .d{fill:var(--p3)}
+.dot.done.p4 .d,body.atlas .dot.p4 .d{fill:var(--p4)}
+.dot.missed .d{fill:var(--hatch)}
+.dot.flag .d{fill:var(--flag)}
+.dot.target .d{fill:var(--target);stroke:var(--ink)}
+.dot.flash-bad .d{fill:var(--bad)!important;transition:none}
+.dot.sel .d{stroke:var(--ink);stroke-width:2.2px}
+
+/* метки на карте */
+#overlay{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform}
+.cap-lbl{display:flex;align-items:center;gap:5px;padding:3px 9px 3px 4px;font:600 13px/1.25 var(--sans);color:var(--ink);background:var(--panel);border-radius:999px;box-shadow:var(--shadow)}
+.cap-lbl svg{width:15px;height:15px;fill:var(--star);flex:none}
+.bad-lbl{padding:5px 10px;font:600 14px/1.2 var(--sans);color:#fff;background:var(--bad);border-radius:9px;box-shadow:var(--shadow);animation:badlbl 2.2s ease forwards}
+@keyframes badlbl{0%{opacity:0;margin-top:6px}10%{opacity:1;margin-top:0}75%{opacity:1}100%{opacity:0}}
+#tip{position:absolute;left:0;top:0;pointer-events:none;padding:4px 9px;font:500 13px/1.3 var(--sans);color:var(--ink);background:var(--panel);border-radius:8px;box-shadow:var(--shadow);white-space:nowrap;z-index:5}
+
+/* зум */
+.zoom{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;background:var(--panel);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;z-index:4}
+.zoom button{width:42px;height:42px;border:0;background:none;display:grid;place-items:center;color:var(--ink)}
+.zoom button+button{border-top:1px solid var(--line)}
+.zoom button:hover{background:var(--panel2)}
+.zoom svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* общие элементы */
+.card{position:absolute;background:var(--panel);color:var(--ink);border-radius:18px;box-shadow:var(--shadow);z-index:6}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:12px;border:1.5px solid var(--line);background:var(--panel);font-weight:600;font-size:15px;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{background:var(--panel2)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07);background:var(--accent)}
+.link{border:0;background:none;padding:4px 2px;color:var(--accent);font-weight:600;font-size:14px;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.link.muted{color:var(--ink3);font-weight:500}
+.seg{display:flex;padding:4px;gap:4px;background:var(--panel2);border-radius:12px}
+.seg label{flex:1;position:relative;cursor:pointer;border-radius:9px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;padding:8px 6px;text-align:center;font-size:14px;font-weight:500;color:var(--ink2);border-radius:9px;transition:background .15s,color .15s}
+.seg input:checked+span{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(27,51,80,.15)}
+
+/* ───── страницы без карты: кабинет, новая игра, как играть ───── */
+.page{position:absolute;inset:0;z-index:7;overflow-y:auto;overscroll-behavior:contain;background:var(--page)}
+.page-in{max-width:560px;margin:0 auto;padding:14px 16px 28px}
+body.home #map,body.setup #map,body.help #map{visibility:hidden}
+body.home .zoom,body.setup .zoom,body.help .zoom{display:none}
+.topbar{display:flex;align-items:center;gap:12px;min-height:46px;margin:0 0 12px}
+.topbar h2{flex:1;margin:0;font:700 26px/1.15 var(--serif);letter-spacing:-.01em}
+.brand{flex:1;display:flex;align-items:center;gap:10px}
+.brand .mark{flex:none;font-size:28px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.brand b{font:700 23px/1 var(--serif);letter-spacing:-.005em}
+.iconbtn{width:42px;height:42px;flex:none;display:grid;place-items:center;padding:0;border-radius:14px;border:0;background:var(--panel);color:var(--ink);box-shadow:var(--card-shadow)}
+.iconbtn:hover{background:var(--panel2)}
+.iconbtn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#atlasCard .iconbtn{border:1.5px solid var(--line);box-shadow:none}
+.tg [data-back]{display:none!important}
+.btn svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.soft{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--accent)}
+.btn.soft:hover{filter:brightness(.97);background:var(--accent-soft)}
+.card2{background:var(--panel);border-radius:20px;padding:16px;box-shadow:var(--card-shadow)}
+
+/* карточка прогресса */
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:20px 18px 18px;background:var(--hero-bg);color:var(--hero-ink)}
+.hero .topo{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--hero-topo);stroke-width:1.2;pointer-events:none}
+.hero>:not(.topo){position:relative}
+.hello{margin:0 0 6px;font-size:15px;color:var(--hero-ink2)}
+.big{margin:0;font:600 30px/1.15 var(--serif);letter-spacing:-.012em;font-variant-numeric:lining-nums;text-wrap:balance}
+.pbar{display:flex;gap:2px;height:10px;margin:16px 0 12px;border-radius:5px;overflow:hidden;background:var(--hero-track)}
+.pbar i{display:block;height:100%}
+.pbar .l{background:var(--hero-l)} .pbar .w{background:var(--hero-w)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{padding:10px 12px 11px;border-radius:14px;background:var(--hero-tile)}
+.stat b{display:block;font:700 26px/1.1 var(--serif);font-variant-numeric:lining-nums tabular-nums}
+.stat span{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:13px;color:var(--hero-ink2)}
+.stat i{width:8px;height:8px;flex:none;border-radius:50%}
+
+/* главные действия */
+.acts{display:grid;gap:10px;margin-top:14px}
+.go{width:100%;min-height:56px;border-radius:18px;font-size:17px}
+.go svg{width:20px;height:20px;fill:currentColor;stroke:none}
+.tile{width:100%;display:flex;align-items:center;gap:14px;padding:14px 16px;border:0;border-radius:18px;background:var(--panel);text-align:left;box-shadow:var(--card-shadow)}
+.tile:hover{background:var(--panel2)}
+.tile .ico{width:46px;height:46px;flex:none;display:grid;place-items:center;border-radius:14px;background:var(--accent-soft);color:var(--accent)}
+.tile .ico svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tile .tt{flex:1;min-width:0}
+.tile .tt b{display:block;font-size:16px;line-height:1.3}
+.tile .tt span{display:block;margin-top:1px;font-size:13.5px;color:var(--ink2);line-height:1.35}
+.chev{width:18px;height:18px;flex:none;fill:none;stroke:var(--ink3);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* что повторить */
+.sec-h{margin:28px 4px 4px;font:700 22px/1.2 var(--serif)}
+.sec-sub{margin:0 4px 12px;font-size:14px;color:var(--ink2)}
+.sec-h+.card2{margin-top:12px}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--panel2);border-radius:13px}
+.tabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 6px;border:0;border-radius:10px;background:none;font-size:15px;font-weight:500;color:var(--ink2)}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(27,51,80,.15)}
+.tabs .n{min-width:22px;padding:1px 7px;border-radius:999px;background:var(--line);font-size:12px;font-weight:600;color:var(--ink2);font-variant-numeric:tabular-nums}
+.tabnote{margin:12px 2px 4px;font-size:13.5px;color:var(--ink2);line-height:1.45}
+.rlist{list-style:none;margin:0;padding:0}
+.rlist li{display:flex;align-items:center;border-bottom:1px solid var(--line)}
+.rlist li:last-child{border-bottom:0}
+.rrow{flex:1;min-width:0;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1px 12px;padding:11px 2px;border:0;background:none;text-align:left}
+.rrow:hover .rname{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.rname{font-weight:600;font-size:15px;line-height:1.3}
+.rcap{grid-column:2;font-size:13.5px;color:var(--ink2);line-height:1.3}
+.rtag{grid-row:1/3;grid-column:3;font-size:12.5px;color:var(--bad);white-space:nowrap}
+.sw{display:inline-block;flex:none;width:16px;height:16px;border-radius:4px}
+.rrow .sw{grid-row:1/3}
+.sw.err{background:repeating-linear-gradient(45deg,var(--hatch) 0 2px,var(--hatch-bg) 2px 5px);box-shadow:inset 0 0 0 1px var(--hatch)}
+.sw.flag{background:var(--flag);box-shadow:inset 0 0 0 1px rgba(168,111,0,.45)}
+.sw.done{background:var(--p2);box-shadow:inset 0 0 0 1px var(--border)}
+.sw.none{background:var(--land);box-shadow:inset 0 0 0 1px var(--border)}
+.rdel{flex:none;width:40px;height:40px;display:grid;place-items:center;padding:0;border:0;border-radius:12px;background:none;color:var(--ink3)}
+.rdel:hover{background:var(--panel2);color:var(--ink)}
+.rdel svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.rempty{margin:14px 2px 2px;font-size:14.5px;color:var(--ink2);line-height:1.5}
+.rmore{margin-top:6px}
+.rgo{width:100%;margin-top:12px;border-radius:14px}
+
+/* регионы */
+.regs{display:grid;grid-template-columns:1fr 1fr;gap:10px;list-style:none;margin:0;padding:0}
+.regs button{width:100%;height:100%;display:flex;align-items:center;gap:12px;padding:14px 12px;border:0;border-radius:18px;background:var(--panel);text-align:left;box-shadow:var(--card-shadow)}
+.regs button:hover{background:var(--panel2)}
+.ring{position:relative;width:48px;height:48px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:5}
+.ring .tr{stroke:var(--line)}
+.ring .fl{stroke:var(--ok);stroke-linecap:round}
+.ring em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;color:var(--ink2);font-variant-numeric:tabular-nums}
+.regs .rn{display:block;font-size:14.5px;font-weight:600;line-height:1.25}
+.regs .rc{display:block;margin-top:3px;font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.home-foot{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 20px;margin-top:26px;text-align:center}
+.store-note{flex-basis:100%;margin:4px 0 0;font-size:13px;color:var(--ink3)}
+
+/* кнопка внизу страницы */
+.page-foot{position:sticky;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--page) 72%,transparent)}
+.page-foot .btn{display:flex;width:100%;max-width:528px;min-height:54px;margin:0 auto;border-radius:18px;font-size:16px}
+
+/* новая игра */
+.group+.group{margin-top:12px}
+.glabel{margin:0 0 10px;font-size:15px;font-weight:600}
+.regions{display:flex;flex-direction:column;gap:2px}
+.reg{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;cursor:pointer;position:relative}
+.reg:hover{background:var(--panel2)}
+.reg input{position:absolute;opacity:0;pointer-events:none}
+.reg .rb{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink3);display:grid;place-items:center}
+.reg input:checked~.rb{border-color:var(--accent)}
+.reg input:checked~.rb::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.reg:has(input:checked){background:var(--accent-soft)}
+.reg .rn{font-size:15px;line-height:1.25}
+.reg .rc{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums;text-align:right;min-width:62px}
+.reg .bar{grid-column:2/4;height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:-4px}
+.reg .bar i{display:block;height:100%;background:var(--ok);border-radius:2px}
+.fine{margin:8px 2px 0;font-size:13px;color:var(--ink3);line-height:1.45}
+
+/* как играть */
+.steps{list-style:none;margin:2px 0 0;padding:0;counter-reset:s}
+.steps li{position:relative;padding:0 0 18px 46px;counter-increment:s}
+.steps li:last-child{padding-bottom:2px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 16px/32px var(--serif);text-align:center}
+.steps b{display:block;margin-bottom:2px;font-size:15.5px}
+.steps p,.htext{margin:0;font-size:14.5px;color:var(--ink2);line-height:1.55}
+.h3{margin:0 0 8px;font:700 19px/1.25 var(--serif)}
+.keys{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:9px}
+.keys li{display:flex;align-items:center;gap:11px;font-size:14.5px;color:var(--ink2);line-height:1.4}
+.keys .sw{width:24px;height:17px}
+.card2+.card2{margin-top:12px}
+
+/* ───── вопрос ───── */
+#qcard{top:14px;left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 24px));padding:14px 20px 0;overflow:hidden}
+.q-top{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink2)}
+.q-top #qPrompt{flex:1}
+.q-top .link{font-size:14px}
+#qName{margin:2px 0 6px;font:600 clamp(28px,5.2vw,42px)/1.12 var(--serif);letter-spacing:-.01em;overflow-wrap:anywhere}
+.q-bottom{display:flex;align-items:center;gap:12px;min-height:34px;padding-bottom:12px}
+#qTries{display:flex;gap:6px}
+#qTries i{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink3)}
+#qTries i.used{border-color:var(--bad);background:var(--bad)}
+#qStatus{flex:1;font-size:14px;font-weight:500;color:var(--ink2)}
+#qStatus.ok{color:var(--ok)} #qStatus.bad{color:var(--bad)}
+#qRepeat{font-size:12px;font-weight:600;color:var(--target);border:1.5px solid var(--target);border-radius:999px;padding:1px 8px}
+#qTicks{display:flex;gap:2px;height:5px;margin:0 -20px}
+#qTicks i{flex:1;background:var(--line)}
+#qTicks i.ok{background:var(--ok)} #qTicks i.bad{background:var(--bad)} #qTicks i.cur{background:var(--ink3)}
+
+/* ───── варианты столицы ───── */
+#sheet{bottom:14px;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 24px));padding:16px 18px 18px}
+#sheet:not([hidden]){animation:sheetin .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes sheetin{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+#sTitle{margin:0 0 10px;font-weight:600;font-size:15px}
+#opts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.opt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:64px;padding:9px 11px;text-align:left;border-radius:12px;border:1.5px solid var(--line);background:var(--panel);font-weight:600;font-size:15px;line-height:1.25;overflow-wrap:anywhere;transition:background .15s,border-color .15s,opacity .2s}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt kbd{font:600 11px/1 var(--sans);color:var(--ink3);border:1px solid var(--line);border-radius:5px;padding:2px 5px}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.opt.dim{opacity:.45}
+#after{display:flex;align-items:flex-end;gap:16px;margin-top:12px}
+.after-text{flex:1;min-width:0}
+#after p{margin:0;font-size:14px;color:var(--ink2);line-height:1.45}
+.mnem{display:flex;gap:9px;align-items:flex-start;margin:10px 0 0;padding:9px 12px 10px;border-radius:12px;background:var(--mn-bg);color:var(--ink);font-size:14.5px;line-height:1.45}
+.mnem svg{flex:none;width:19px;height:19px;margin-top:1px;fill:none;stroke:var(--mn-ico);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mnem b{font-weight:700;background:linear-gradient(transparent 58%,var(--mn-mark) 58%);padding:0 1px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+#sheet .mnem:not([hidden]){animation:mnin .35s ease-out}
+@keyframes mnin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+#after .verdict{display:block;font-weight:600;font-size:15px;color:var(--ink);margin-bottom:2px}
+#after .verdict.ok{color:var(--ok)} #after .verdict.bad{color:var(--bad)}
+.after-btns{display:flex;gap:8px;flex:none}
+#btnNext{min-width:130px}
+.btn.flag svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.btn.flag[aria-pressed="true"]{background:var(--flag);border-color:var(--flag);color:var(--ink)}
+.btn.flag[aria-pressed="true"] svg{stroke-width:2.6}
+
+/* ───── итоги ───── */
+#end{left:50%;top:50%;transform:translate(-50%,-50%);width:min(480px,calc(100% - 24px));max-height:calc(100% - 32px);display:flex;flex-direction:column;overflow:hidden}
+#end .end-scroll{overflow:auto;padding:28px 28px 8px}
+#end h2{margin:0;font:700 34px/1.1 var(--serif)}
+.score{margin:14px 0 4px;font:600 20px/1.3 var(--sans)}
+.score b{font:700 44px/1 var(--serif);margin-right:6px}
+.sub{margin:0;color:var(--ink2);font-size:15px}
+.miss-h{margin:22px 0 8px;font-weight:600;font-size:15px}
+.misses{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.misses li{display:flex;gap:10px;align-items:baseline;padding:9px 2px;border-bottom:1px solid var(--line);font-size:15px}
+.misses .mn{font-weight:600}
+.misses .mc{flex:1;color:var(--ink2)}
+.misses .mt{font-size:12px;color:var(--bad);white-space:nowrap}
+.end-actions{display:flex;flex-wrap:wrap;gap:10px;padding:18px 28px 24px}
+.end-actions .btn{flex:1 1 140px}
+
+/* ───── атлас ───── */
+#atlasCard{left:20px;bottom:20px;width:min(380px,calc(100% - 24px));padding:16px 18px 18px}
+.a-top{display:flex;gap:10px;align-items:center}
+.a-top input{flex:1;min-width:0;height:42px;padding:0 12px;border-radius:11px;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);font:inherit;font-size:15px}
+.a-top input:focus{outline:none;border-color:var(--accent)}
+#aInfo{margin-top:12px}
+#aInfo h3{margin:0;font:600 28px/1.15 var(--serif)}
+#aInfo .acap{margin:6px 0 0;font-size:16px;display:flex;align-items:center;gap:6px}
+#aInfo .acap svg{width:16px;height:16px;fill:var(--star)}
+#aInfo .anote{margin:8px 0 0;font-size:14px;color:var(--ink2)}
+#aInfo .ahint{margin:0;font-size:14px;color:var(--ink2)}
+#aInfo .mnem{margin-top:10px}
+#aInfo .astat{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:14px;color:var(--ink2)}
+#aInfo .astat .sw{width:14px;height:14px}
+#aInfo #aFlag{margin-top:12px;min-height:40px;padding:0 14px;font-size:14px}
+#aInfo:empty{display:none}
+
+/* загрузка */
+#loading{position:absolute;inset:0;display:grid;place-items:center;z-index:10;background:var(--page)}
+#loading .lc{text-align:center;padding:24px;max-width:360px}
+#loading .load-mark{margin:0 0 10px;font-size:52px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+#loading h1{margin:0 0 8px;font:700 40px/1 var(--serif)}
+#loading p{margin:0;color:var(--ink2)}
+#loading .pen{width:120px;height:3px;margin:18px auto 0;border-radius:2px;background:var(--line);overflow:hidden}
+#loading .pen i{display:block;width:40%;height:100%;background:var(--accent);border-radius:2px;animation:pen 1.1s ease-in-out infinite}
+@keyframes pen{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+
+/* ───── телефон ───── */
+@media (max-width:720px){
+  .big{font-size:27px}
+  .stat{padding:9px 10px 10px}
+  .stat b{font-size:23px}
+  .page-in{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+  #qcard{top:8px;padding:10px 16px 0;border-radius:16px}
+  #qTicks{margin:0 -16px}
+  .q-bottom{padding-bottom:10px;min-height:30px}
+  #sheet{bottom:8px;padding:12px 12px calc(12px + env(safe-area-inset-bottom));border-radius:16px}
+  #opts{grid-template-columns:1fr 1fr}
+  .opt{flex-direction:row;align-items:center;min-height:46px;padding:8px 11px;gap:9px}
+  .opt:last-child:nth-child(odd){grid-column:1/-1}
+  #after{flex-wrap:wrap;gap:10px}
+  .after-text{flex-basis:100%}
+  .after-btns{width:100%}
+  .after-btns .btn{flex:1;padding:0 12px}
+  #btnNext{flex:1.3;min-width:0}
+  .opt.dim{display:none}
+  .mnem{font-size:14px;margin-top:8px}
+  .zoom{top:auto;bottom:auto;top:46%}
+  body.capphase .zoom{display:none}
+  #atlasCard{left:10px;right:10px;bottom:10px;width:auto}
+  #end .end-scroll{padding:22px 20px 6px}
+  .end-actions{padding:14px 20px 20px}
+}
+@media (hover:none){.opt kbd{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}
+</style>
+</head>
+<body class="booting">
+<svg id="map" aria-label="Карта мира">
+  <defs>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <rect class="hb" width="6" height="6"/>
+      <line class="hl" x1="0" y1="0" x2="0" y2="6" stroke-width="2"/>
+    </pattern>
+    <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></symbol>
+  </defs>
+  <g id="world">
+    <path id="sea"/>
+    <path id="grid"/>
+    <g id="lands"></g>
+    <g id="hilite"></g>
+    <g id="dots"></g>
+  </g>
+</svg>
+<div id="overlay"></div>
+<div id="tip" hidden></div>
+
+<div class="zoom" id="zoom" hidden>
+  <button id="zIn" aria-label="Приблизить" title="Приблизить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button id="zOut" aria-label="Отдалить" title="Отдалить"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+  <button id="zFit" aria-label="Показать регион целиком" title="Показать регион целиком"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+</div>
+
+<div id="loading">
+  <div class="lc">
+    <div class="load-mark" aria-hidden="true">🧠</div>
+    <h1>СwЭГ</h1>
+    <p id="loadMsg">Рисую карту мира…</p>
+    <div class="pen" id="loadPen"><i></i></div>
+    <p id="loadErr" hidden style="margin-top:16px"><button class="btn primary" onclick="location.reload()">Обновить страницу</button></p>
+  </div>
+</div>
+
+<!-- Кабинет -->
+<div id="home" class="page" hidden>
+  <div class="page-in">
+    <header class="topbar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">🧠</span>
+        <b>СwЭГ</b>
+      </div>
+      <button class="iconbtn" id="btnHelp" aria-label="Как играть" title="Как играть"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.7 9.4a2.4 2.4 0 1 1 3.3 2.2c-.6.3-1 .8-1 1.5v.5M12 16.6v.1"/></svg></button>
+    </header>
+
+    <section class="hero" aria-label="Твой прогресс">
+      <svg class="topo" id="topo" aria-hidden="true"></svg>
+      <p class="hello" id="hello" hidden></p>
+      <h1 class="big" id="bigLine"></h1>
+      <div class="pbar" id="pbar" aria-hidden="true"></div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <div class="acts">
+      <button class="btn primary go" id="btnNew"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>Новая игра</button>
+      <button class="tile" id="btnAtlas">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5l5-2 6 2 5-2v13l-5 2-6-2-5 2zM9 4.5v13M15 6.5v13"/></svg></span>
+        <span class="tt"><b>Атлас</b><span>Вся карта мира. Нажми на страну — узнаешь её столицу</span></span>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+    <h2 class="sec-h" id="repTitle">Что повторить</h2>
+    <section class="card2" aria-labelledby="repTitle">
+      <div class="tabs" role="tablist" aria-label="Списки для повторения">
+        <button role="tab" id="tabErr" aria-selected="true">Ошибся <span class="n" id="nErr">0</span></button>
+        <button role="tab" id="tabFlag" aria-selected="false">Не знал <span class="n" id="nFlag">0</span></button>
+      </div>
+      <p class="tabnote" id="tabNote"></p>
+      <ul class="rlist" id="rList"></ul>
+      <p class="rempty" id="rEmpty" hidden></p>
+      <button class="link rmore" id="rMore" hidden></button>
+      <button class="btn soft rgo" id="btnPractice" hidden></button>
+    </section>
+
+    <h2 class="sec-h" id="regTitle">По регионам</h2>
+    <p class="sec-sub">Нажми на регион, чтобы сыграть только по нему.</p>
+    <ul class="regs" id="homeRegions" aria-labelledby="regTitle"></ul>
+
+    <div class="home-foot">
+      <button class="link" id="btnHelp2">Как играть</button>
+      <button class="link muted" id="btnReset">Сбросить прогресс</button>
+      <p class="store-note" id="storeNote"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Новая игра -->
+<div id="setup" class="page" hidden>
+  <div class="page-in">
+    <header class="topbar">
+      <button class="iconbtn" data-back aria-label="Назад в кабинет" title="Назад в кабинет"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h2>Новая игра</h2>
+    </header>
+    <section class="card2 group" aria-labelledby="gReg">
+      <h3 class="glabel" id="gReg">Регион</h3>
+      <div class="regions" id="regions" role="radiogroup" aria-labelledby="gReg"></div>
+      <p class="fine">Первыми в раунд попадают страны, которые ты знаешь хуже всего.</p>
+    </section>
+    <section class="card2 group" aria-labelledby="gMode">
+      <h3 class="glabel" id="gMode">Что спрашивать</h3>
+      <div class="seg" id="modeSeg" role="radiogroup" aria-labelledby="gMode">
+        <label><input type="radio" name="mode" value="both" checked><span>Страну и столицу</span></label>
+        <label><input type="radio" name="mode" value="map"><span>Только страну</span></label>
+        <label><input type="radio" name="mode" value="cap"><span>Только столицу</span></label>
+      </div>
+    </section>
+    <section class="card2 group" aria-labelledby="gSize">
+      <h3 class="glabel" id="gSize">Сколько стран в раунде</h3>
+      <div class="seg" id="sizeSeg" role="radiogroup" aria-labelledby="gSize">
+        <label><input type="radio" name="size" value="10"><span>10</span></label>
+        <label><input type="radio" name="size" value="20" checked><span>20</span></label>
+        <label><input type="radio" name="size" value="all"><span>Все</span></label>
+      </div>
+    </section>
+    <section class="card2 group" aria-labelledby="gMn">
+      <h3 class="glabel" id="gMn">Ассоциации для запоминания</h3>
+      <div class="seg" id="mnSeg" role="radiogroup" aria-labelledby="gMn">
+        <label><input type="radio" name="mn" value="always" checked><span>После ответа</span></label>
+        <label><input type="radio" name="mn" value="wrong"><span>Если ошибся</span></label>
+        <label><input type="radio" name="mn" value="off"><span>Не надо</span></label>
+      </div>
+    </section>
+  </div>
+  <div class="page-foot"><button class="btn primary" id="btnStart">Начать</button></div>
+</div>
+
+<!-- Как играть -->
+<div id="help" class="page" hidden>
+  <div class="page-in">
+    <header class="topbar">
+      <button class="iconbtn" data-back aria-label="Назад в кабинет" title="Назад в кабинет"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h2>Как играть</h2>
+    </header>
+    <section class="card2">
+      <ol class="steps">
+        <li><b>Найди страну на карте</b><p>Я называю страну, ты нажимаешь на неё. Даётся три попытки. Карту двигай пальцем, приближай двумя пальцами или колёсиком мыши.</p></li>
+        <li><b>Не знаешь, где она?</b><p>Жми «Сузить поиск». Сначала приближу нужный район, потом подсвечу 7 стран на выбор. Если совсем никак, покажу сам.</p></li>
+        <li><b>Выбери столицу</b><p>Пять вариантов, среди них есть ловушки: крупные города этой страны и столицы соседей. После ответа появится ассоциация, чтобы легче запомнить.</p></li>
+        <li><b>Угадал наугад? Жми «Не знал»</b><p>Страна попадёт в список «Не знал» в кабинете, и её можно будет потренировать отдельно. Страны, где ты ошибся, сами собираются в список «Ошибся».</p></li>
+      </ol>
+    </section>
+    <section class="card2">
+      <h3 class="h3">Как считается прогресс</h3>
+      <p class="htext">Страна выучена, когда ты дважды подряд ответил на неё правильно. Ошибка сбрасывает счёт. Из списков «Ошибся» и «Не знал» страна уходит сама, как только ты её выучишь.</p>
+      <ul class="keys">
+        <li><span class="sw done"></span>На карте в игре закрашена — ответил правильно</li>
+        <li><span class="sw err"></span>Заштрихована — была ошибка</li>
+      </ul>
+    </section>
+    <section class="card2">
+      <h3 class="h3">Атлас</h3>
+      <p class="htext">Вся карта мира, раскрашенная. Нажми на страну, и я покажу её столицу и ассоциацию. Искать можно по названию страны или столицы. Там же страну можно добавить в «Не знал».</p>
+    </section>
+  </div>
+  <div class="page-foot"><button class="btn primary" id="btnHelpOk">Понятно</button></div>
+</div>
+
+<!-- Вопрос -->
+<section id="qcard" class="card" hidden aria-live="polite">
+  <div class="q-top">
+    <span id="qPrompt">Найди на карте</span>
+    <span id="qRepeat" hidden>повтор</span>
+    <span id="qCount"></span>
+    <button class="link" id="btnMenu" data-back>Выйти</button>
+  </div>
+  <h2 id="qName"></h2>
+  <div class="q-bottom">
+    <div id="qTries" aria-hidden="true"></div>
+    <span id="qStatus"></span>
+    <button class="link" id="btnHint" hidden>Дать 7 вариантов</button>
+    <button class="link" id="btnGiveUp">Показать, где</button>
+  </div>
+  <div id="qTicks" aria-hidden="true"></div>
+</section>
+
+<!-- Столица -->
+<section id="sheet" class="card" hidden>
+  <p id="sTitle">Выбери столицу</p>
+  <div id="opts" role="group" aria-label="Варианты столицы"></div>
+  <div id="after" hidden>
+    <div class="after-text">
+      <p id="afterText"></p>
+      <div class="mnem" id="mnem" hidden></div>
+    </div>
+    <div class="after-btns">
+      <button class="btn flag" id="btnFlag" aria-pressed="false" title="Добавить в список «Не знал», чтобы потренировать отдельно"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.6L7 20z"/></svg><span>Не знал</span></button>
+      <button class="btn primary" id="btnNext">Дальше</button>
+    </div>
+  </div>
+</section>
+
+<!-- Итоги -->
+<section id="end" class="card" hidden aria-labelledby="endTitle">
+  <div class="end-scroll">
+    <h2 id="endTitle">Раунд пройден</h2>
+    <p class="score" id="endScore"></p>
+    <p class="sub" id="endSub"></p>
+    <div id="endMiss"></div>
+  </div>
+  <div class="end-actions">
+    <button class="btn primary" id="btnRetry">Повторить ошибки</button>
+    <button class="btn" id="btnAgain">Ещё раунд</button>
+    <button class="btn" id="btnEndMenu">В кабинет</button>
+  </div>
+</section>
+
+<!-- Атлас -->
+<section id="atlasCard" class="card" hidden>
+  <div class="a-top">
+    <button class="iconbtn" id="btnAtlasExit" data-back aria-label="Назад в кабинет" title="Назад в кабинет"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <input id="aSearch" list="aList" placeholder="Страна или столица" autocomplete="off" aria-label="Найти страну по названию или столице">
+    <datalist id="aList"></datalist>
+  </div>
+  <div id="aInfo"></div>
+</section>
+
+<script>
+(() => {
+'use strict';
+/* Страны и столицы. Формат строки:
+   [ISO-номер, страна, столица, широта столицы, долгота столицы, регионы,
+    города-ловушки (через запятую), исключить из вариантов, заметка, имена в Natural Earth (через |)]
+   Регионы: eu — Европа, as — Азия, af — Африка, na — Северная и Центральная Америка, sa — Южная Америка, oc — Океания */
+const COUNTRIES_RAW = [
+// ───────── ЕВРОПА ─────────
+[643,"Россия","Москва",55.76,37.62,"eu as","Санкт-Петербург,Новосибирск,Екатеринбург,Казань","","","Russia"],
+[804,"Украина","Киев",50.45,30.52,"eu","Харьков,Одесса,Львов,Днепр","","","Ukraine"],
+[112,"Беларусь","Минск",53.90,27.57,"eu","Гомель,Брест,Витебск,Гродно","","","Belarus"],
+[616,"Польша","Варшава",52.23,21.01,"eu","Краков,Гданьск,Лодзь,Вроцлав","","","Poland"],
+[276,"Германия","Берлин",52.52,13.40,"eu","Мюнхен,Гамбург,Бонн,Франкфурт-на-Майне","","Бонн был столицей ФРГ в 1949–1990 годах.","Germany"],
+[250,"Франция","Париж",48.86,2.35,"eu","Марсель,Лион,Ницца,Тулуза","","","France"],
+[826,"Великобритания","Лондон",51.51,-0.13,"eu","Манчестер,Эдинбург,Ливерпуль,Бирмингем","","","United Kingdom|UK"],
+[372,"Ирландия","Дублин",53.35,-6.26,"eu","Корк,Голуэй,Лимерик","Белфаст","","Ireland"],
+[724,"Испания","Мадрид",40.42,-3.70,"eu","Барселона,Севилья,Валенсия,Бильбао","","","Spain"],
+[620,"Португалия","Лиссабон",38.72,-9.14,"eu","Порту,Коимбра,Брага","","","Portugal"],
+[380,"Италия","Рим",41.90,12.50,"eu","Милан,Неаполь,Венеция,Флоренция,Турин","Ватикан,Сан-Марино","","Italy"],
+[528,"Нидерланды","Амстердам",52.37,4.90,"eu","Гаага,Роттердам,Утрехт","","Столица — Амстердам, но парламент, правительство и король находятся в Гааге.","Netherlands"],
+[56,"Бельгия","Брюссель",50.85,4.35,"eu","Антверпен,Брюгге,Льеж,Гент","","","Belgium"],
+[442,"Люксембург","Люксембург",49.61,6.13,"eu","Эш-сюр-Альзетт,Дифферданж","","Столица называется так же, как страна.","Luxembourg"],
+[756,"Швейцария","Берн",46.95,7.45,"eu","Цюрих,Женева,Базель,Лозанна","","Берн официально называется «федеральным городом»; крупнейший город — Цюрих.","Switzerland"],
+[40,"Австрия","Вена",48.21,16.37,"eu","Зальцбург,Грац,Инсбрук,Линц","","","Austria"],
+[438,"Лихтенштейн","Вадуц",47.14,9.52,"eu","Шан,Тризен","","","Liechtenstein"],
+[492,"Монако","Монако",43.73,7.42,"eu","Монте-Карло","","Город-государство; Монте-Карло — один из его районов.","Monaco"],
+[20,"Андорра","Андорра-ла-Велья",42.51,1.52,"eu","Эскальдес-Энгордань","","","Andorra"],
+[674,"Сан-Марино","Сан-Марино",43.94,12.45,"eu","Серравалле,Борго-Маджоре","","","San Marino"],
+[336,"Ватикан","Ватикан",41.90,12.45,"eu","","Рим","Город-государство внутри Рима — самое маленькое государство мира.","Vatican|Holy See"],
+[470,"Мальта","Валлетта",35.90,14.51,"eu","Биркиркара,Слима","","","Malta"],
+[208,"Дания","Копенгаген",55.68,12.57,"eu","Орхус,Оденсе,Ольборг","","","Denmark"],
+[578,"Норвегия","Осло",59.91,10.75,"eu","Берген,Тронхейм,Ставангер","","","Norway"],
+[752,"Швеция","Стокгольм",59.33,18.07,"eu","Гётеборг,Мальмё,Уппсала","","","Sweden"],
+[246,"Финляндия","Хельсинки",60.17,24.94,"eu","Турку,Тампере,Оулу","","","Finland"],
+[352,"Исландия","Рейкьявик",64.15,-21.94,"eu","Акюрейри","","","Iceland"],
+[233,"Эстония","Таллин",59.44,24.75,"eu","Тарту,Нарва,Пярну","","","Estonia"],
+[428,"Латвия","Рига",56.95,24.11,"eu","Даугавпилс,Юрмала,Лиепая","","","Latvia"],
+[440,"Литва","Вильнюс",54.69,25.28,"eu","Каунас,Клайпеда","","","Lithuania"],
+[203,"Чехия","Прага",50.08,14.44,"eu","Брно,Острава,Пльзень","","","Czechia|Czech Rep.|Czech Republic"],
+[703,"Словакия","Братислава",48.15,17.11,"eu","Кошице,Жилина","","","Slovakia"],
+[348,"Венгрия","Будапешт",47.50,19.04,"eu","Дебрецен,Сегед,Печ","","","Hungary"],
+[642,"Румыния","Бухарест",44.43,26.10,"eu","Клуж-Напока,Констанца,Яссы,Тимишоара","","","Romania"],
+[498,"Молдова","Кишинёв",47.01,28.86,"eu","Бельцы,Тирасполь","","","Moldova"],
+[100,"Болгария","София",42.70,23.32,"eu","Пловдив,Варна,Бургас","","","Bulgaria"],
+[300,"Греция","Афины",37.98,23.73,"eu","Салоники,Патры,Ираклион","","","Greece"],
+[8,"Албания","Тирана",41.33,19.82,"eu","Дуррес,Влёра,Шкодер","","","Albania"],
+[807,"Северная Македония","Скопье",42.00,21.43,"eu","Битола,Охрид,Куманово","","","North Macedonia|Macedonia"],
+[688,"Сербия","Белград",44.79,20.45,"eu","Нови-Сад,Ниш,Крагуевац","Приштина","","Serbia"],
+[499,"Черногория","Подгорица",42.44,19.26,"eu","Никшич,Будва,Бар","Цетине","Цетине — историческая «старая королевская столица», но столица страны — Подгорица.","Montenegro"],
+[70,"Босния и Герцеговина","Сараево",43.86,18.41,"eu","Баня-Лука,Мостар,Тузла","","","Bosnia and Herz.|Bosnia and Herzegovina"],
+[191,"Хорватия","Загреб",45.81,15.98,"eu","Сплит,Дубровник,Риека","","","Croatia"],
+[705,"Словения","Любляна",46.06,14.51,"eu","Марибор,Копер","","","Slovenia"],
+
+// ───────── АЗИЯ ─────────
+[792,"Турция","Анкара",39.93,32.86,"as eu","Стамбул,Измир,Анталья,Бурса","","Столица с 1923 года — Анкара; Стамбул — крупнейший город страны.","Turkey|Türkiye"],
+[196,"Кипр","Никосия",35.17,33.36,"as eu","Лимасол,Ларнака,Пафос","","","Cyprus"],
+[268,"Грузия","Тбилиси",41.72,44.79,"as","Батуми,Кутаиси,Рустави","Сухум,Цхинвал","","Georgia"],
+[51,"Армения","Ереван",40.18,44.51,"as","Гюмри,Ванадзор","","","Armenia"],
+[31,"Азербайджан","Баку",40.41,49.87,"as","Гянджа,Сумгаит,Шеки","","","Azerbaijan"],
+[398,"Казахстан","Астана",51.17,71.45,"as","Алма-Ата,Шымкент,Караганда","","Астана — столица с 1997 года (в 2019–2022 называлась Нур-Султан); до этого столицей была Алма-Ата.","Kazakhstan"],
+[860,"Узбекистан","Ташкент",41.30,69.24,"as","Самарканд,Бухара,Наманган","","","Uzbekistan"],
+[795,"Туркменистан","Ашхабад",37.95,58.38,"as","Туркменабат,Мары,Дашогуз","","","Turkmenistan"],
+[417,"Киргизия","Бишкек",42.87,74.59,"as","Ош,Джалал-Абад,Каракол","","","Kyrgyzstan"],
+[762,"Таджикистан","Душанбе",38.56,68.77,"as","Худжанд,Бохтар,Куляб","","","Tajikistan"],
+[4,"Афганистан","Кабул",34.53,69.17,"as","Кандагар,Герат,Мазари-Шариф","","","Afghanistan"],
+[586,"Пакистан","Исламабад",33.68,73.05,"as","Карачи,Лахор,Пешавар","","Исламабад построен как столица в 1960-х; Карачи — крупнейший город и бывшая столица.","Pakistan"],
+[356,"Индия","Нью-Дели",28.61,77.21,"as","Мумбаи,Калькутта,Бангалор,Ченнаи","","","India"],
+[524,"Непал","Катманду",27.72,85.32,"as","Покхара,Лалитпур","","","Nepal"],
+[64,"Бутан","Тхимпху",27.47,89.64,"as","Паро,Пунакха","","","Bhutan"],
+[50,"Бангладеш","Дакка",23.81,90.41,"as","Читтагонг,Кхулна,Силхет","","","Bangladesh"],
+[144,"Шри-Ланка","Шри-Джаяварденепура-Котте",6.90,79.92,"as","Канди,Галле,Джафна","Коломбо","Официальная столица — Шри-Джаяварденепура-Котте; Коломбо — крупнейший город, бывшая столица и деловой центр.","Sri Lanka"],
+[462,"Мальдивы","Мале",4.18,73.51,"as","Адду","","","Maldives"],
+[156,"Китай","Пекин",39.90,116.40,"as","Шанхай,Гуанчжоу,Шэньчжэнь,Гонконг","Тайбэй","","China"],
+[496,"Монголия","Улан-Батор",47.89,106.91,"as","Дархан,Эрдэнэт,Чойбалсан","","","Mongolia"],
+[408,"КНДР","Пхеньян",39.03,125.75,"as","Хамхын,Нампхо,Кэсон","","Корейская Народно-Демократическая Республика (Северная Корея).","North Korea|Dem. Rep. Korea"],
+[410,"Республика Корея","Сеул",37.57,126.98,"as","Пусан,Инчхон,Тэгу","","Южная Корея.","South Korea|Korea"],
+[392,"Япония","Токио",35.68,139.69,"as","Осака,Киото,Иокогама,Саппоро","","","Japan"],
+[704,"Вьетнам","Ханой",21.03,105.85,"as","Хошимин,Дананг,Хайфон","","Хошимин (бывший Сайгон) — крупнейший город страны.","Vietnam"],
+[418,"Лаос","Вьентьян",17.97,102.63,"as","Луангпхабанг,Паксе","","","Laos|Lao PDR"],
+[116,"Камбоджа","Пномпень",11.56,104.92,"as","Сиемреап,Сиануквиль,Баттамбанг","","","Cambodia"],
+[764,"Таиланд","Бангкок",13.76,100.50,"as","Чиангмай,Пхукет,Паттайя","","","Thailand"],
+[104,"Мьянма","Нейпьидо",19.76,96.08,"as","Янгон,Мандалай","","С 2005 года столица — Нейпьидо; до этого — Янгон (Рангун).","Myanmar"],
+[458,"Малайзия","Куала-Лумпур",3.14,101.69,"as","Ипох,Джохор-Бару,Кучинг","Путраджая","Столица — Куала-Лумпур; многие министерства переехали в соседнюю Путраджаю.","Malaysia"],
+[702,"Сингапур","Сингапур",1.29,103.85,"as","","","Город-государство.","Singapore"],
+[360,"Индонезия","Джакарта",-6.21,106.85,"as","Сурабая,Бандунг,Денпасар,Медан","Нусантара","На Калимантане строится новая столица Нусантара, но официально столицей остаётся Джакарта (пока не издан указ президента).","Indonesia"],
+[96,"Бруней","Бандар-Сери-Бегаван",4.94,114.95,"as","Куала-Белайт,Тутонг","","","Brunei"],
+[608,"Филиппины","Манила",14.60,120.98,"as","Себу,Давао","Кесон-Сити","Манила входит в агломерацию Метро-Манила; соседний Кесон-Сити — крупнейший город и бывшая столица.","Philippines"],
+[626,"Восточный Тимор","Дили",-8.56,125.57,"as","Баукау","","","Timor-Leste|East Timor"],
+[364,"Иран","Тегеран",35.69,51.39,"as","Исфахан,Мешхед,Тебриз,Шираз","","","Iran"],
+[368,"Ирак","Багдад",33.31,44.36,"as","Басра,Мосул,Эрбиль","","","Iraq"],
+[760,"Сирия","Дамаск",33.51,36.29,"as","Алеппо,Хомс,Латакия","","","Syria"],
+[422,"Ливан","Бейрут",33.89,35.50,"as","Сидон,Тир,Баальбек","","","Lebanon"],
+[376,"Израиль","Иерусалим",31.77,35.21,"as","Хайфа,Эйлат,Беэр-Шева","Тель-Авив,Восточный Иерусалим,Рамалла","Израиль считает столицей Иерусалим; международный статус города спорный, поэтому большинство посольств находятся в Тель-Авиве.","Israel"],
+[275,"Палестина","Восточный Иерусалим",31.78,35.23,"as","Газа,Хеврон,Наблус","Рамалла,Иерусалим,Тель-Авив","Провозглашённая столица — Восточный Иерусалим; фактический административный центр — Рамалла.","Palestine"],
+[400,"Иордания","Амман",31.95,35.93,"as","Акаба,Эз-Зарка,Ирбид","","","Jordan"],
+[682,"Саудовская Аравия","Эр-Рияд",24.71,46.68,"as","Джидда,Мекка,Медина,Даммам","","","Saudi Arabia"],
+[887,"Йемен","Сана",15.37,44.19,"as","Таиз,Ходейда,Мукалла","Аден","Конституционная столица — Сана; из-за войны признанное правительство базируется в Адене.","Yemen"],
+[512,"Оман","Маскат",23.59,58.41,"as","Салала,Сохар,Низва","","","Oman"],
+[784,"ОАЭ","Абу-Даби",24.45,54.38,"as","Дубай,Шарджа,Эль-Айн","","Объединённые Арабские Эмираты. Дубай — крупнейший город, но столица — Абу-Даби.","United Arab Emirates"],
+[634,"Катар","Доха",25.29,51.53,"as","Эр-Райян,Эль-Вакра","","","Qatar"],
+[48,"Бахрейн","Манама",26.23,50.59,"as","Мухаррак,Иса-Таун","","","Bahrain"],
+[414,"Кувейт","Эль-Кувейт",29.37,47.98,"as","Эль-Джахра,Эль-Ахмади","","","Kuwait"],
+
+// ───────── АФРИКА ─────────
+[818,"Египет","Каир",30.04,31.24,"af","Александрия,Гиза,Луксор,Асуан","","","Egypt"],
+[434,"Ливия","Триполи",32.89,13.19,"af","Бенгази,Мисурата,Сирт","","","Libya"],
+[788,"Тунис","Тунис",36.81,10.18,"af","Сфакс,Сус,Бизерта","","Столица называется так же, как страна.","Tunisia"],
+[12,"Алжир","Алжир",36.75,3.06,"af","Оран,Константина,Аннаба","","Столица называется так же, как страна.","Algeria"],
+[504,"Марокко","Рабат",34.02,-6.83,"af","Касабланка,Марракеш,Фес,Танжер","","Касабланка — крупнейший город, но столица — Рабат.","Morocco"],
+[478,"Мавритания","Нуакшот",18.09,-15.98,"af","Нуадибу,Киффа","","","Mauritania"],
+[466,"Мали","Бамако",12.64,-8.00,"af","Томбукту,Мопти,Сегу","","","Mali"],
+[562,"Нигер","Ниамей",13.51,2.11,"af","Зиндер,Агадес,Маради","","","Niger"],
+[148,"Чад","Нджамена",12.13,15.06,"af","Мунду,Абеше","","","Chad"],
+[729,"Судан","Хартум",15.50,32.56,"af","Омдурман,Кассала,Эль-Обейд","Порт-Судан","Официальная столица — Хартум; во время войны часть правительства работает в Порт-Судане.","Sudan"],
+[728,"Южный Судан","Джуба",4.85,31.58,"af","Вау,Малакаль","","","S. Sudan|South Sudan"],
+[231,"Эфиопия","Аддис-Абеба",9.03,38.74,"af","Дыре-Дауа,Гондэр,Мэкэле","","","Ethiopia"],
+[232,"Эритрея","Асмэра",15.32,38.93,"af","Массауа,Кэрэн","","","Eritrea"],
+[262,"Джибути","Джибути",11.59,43.15,"af","Али-Сабих,Таджура","","Столица называется так же, как страна.","Djibouti"],
+[706,"Сомали","Могадишо",2.05,45.32,"af","Кисмайо,Байдабо","Харгейса","","Somalia"],
+[404,"Кения","Найроби",-1.29,36.82,"af","Момбаса,Кисуму,Накуру","","","Kenya"],
+[800,"Уганда","Кампала",0.35,32.58,"af","Энтеббе,Гулу,Джинджа","","Энтеббе был столицей до 1962 года.","Uganda"],
+[834,"Танзания","Додома",-6.16,35.75,"af","Дар-эс-Салам,Аруша,Мванза","","Столица — Додома; Дар-эс-Салам — бывшая столица и крупнейший город.","Tanzania"],
+[646,"Руанда","Кигали",-1.95,30.06,"af","Бутаре,Гисеньи","","","Rwanda"],
+[108,"Бурунди","Гитега",-3.43,29.93,"af","Нгози","Бужумбура","С 2019 года политическая столица — Гитега; Бужумбура — бывшая столица и экономический центр.","Burundi"],
+[180,"ДР Конго","Киншаса",-4.32,15.31,"af","Лубумбаши,Кисангани,Гома","","Демократическая Республика Конго (Конго-Киншаса).","Dem. Rep. Congo|Democratic Republic of the Congo"],
+[178,"Республика Конго","Браззавиль",-4.26,15.24,"af","Пуэнт-Нуар,Долизи","","Конго-Браззавиль. Столицы двух Конго стоят друг напротив друга на реке Конго.","Congo|Republic of the Congo"],
+[266,"Габон","Либревиль",0.42,9.47,"af","Порт-Жантиль,Франсвиль","","","Gabon"],
+[226,"Экваториальная Гвинея","Сьюдад-де-ла-Пас",1.59,10.82,"af","Бата,Эбебийин","Малабо","В январе 2026 года столица официально перенесена из Малабо в Сьюдад-де-ла-Пас (на материке).","Eq. Guinea|Equatorial Guinea"],
+[120,"Камерун","Яунде",3.85,11.50,"af","Дуала,Гаруа,Баменда","","Дуала — крупнейший город и порт, но столица — Яунде.","Cameroon"],
+[140,"ЦАР","Банги",4.39,18.56,"af","Бамбари,Берберати","","Центральноафриканская Республика.","Central African Rep.|Central African Republic"],
+[566,"Нигерия","Абуджа",9.08,7.40,"af","Лагос,Кано,Ибадан,Порт-Харкорт","","С 1991 года столица — Абуджа; до этого — Лагос.","Nigeria"],
+[204,"Бенин","Порто-Ново",6.50,2.60,"af","Параку,Абомей","Котону","Официальная столица — Порто-Ново, правительство находится в Котону.","Benin"],
+[768,"Того","Ломе",6.13,1.22,"af","Сокоде,Кара","","","Togo"],
+[288,"Гана","Аккра",5.60,-0.19,"af","Кумаси,Тамале,Такоради","","","Ghana"],
+[384,"Кот-д’Ивуар","Ямусукро",6.82,-5.28,"af","Абиджан,Буаке,Корого","","Столица с 1983 года — Ямусукро; Абиджан — крупнейший город и экономический центр.","Côte d'Ivoire|Ivory Coast|Cote d'Ivoire"],
+[854,"Буркина-Фасо","Уагадугу",12.37,-1.52,"af","Бобо-Диуласо,Кудугу","","","Burkina Faso"],
+[430,"Либерия","Монровия",6.30,-10.80,"af","Гбарнга,Бьюкенен","","","Liberia"],
+[694,"Сьерра-Леоне","Фритаун",8.48,-13.23,"af","Бо,Кенема","","","Sierra Leone"],
+[324,"Гвинея","Конакри",9.64,-13.58,"af","Канкан,Нзерекоре","","","Guinea"],
+[624,"Гвинея-Бисау","Бисау",11.86,-15.60,"af","Бафата,Габу","","","Guinea-Bissau"],
+[686,"Сенегал","Дакар",14.72,-17.47,"af","Сен-Луи,Тьес,Зигиншор","","","Senegal"],
+[270,"Гамбия","Банжул",13.45,-16.58,"af","Серекунда,Бриками","","","Gambia"],
+[132,"Кабо-Верде","Прая",14.93,-23.51,"af","Минделу","","","Cabo Verde|Cape Verde"],
+[24,"Ангола","Луанда",-8.84,13.23,"af","Уамбо,Бенгела,Лобиту","","","Angola"],
+[894,"Замбия","Лусака",-15.39,28.32,"af","Ндола,Китве,Ливингстон","","","Zambia"],
+[454,"Малави","Лилонгве",-13.96,33.79,"af","Блантайр,Зомба,Мзузу","","Лилонгве — столица с 1975 года; до этого — Зомба.","Malawi"],
+[508,"Мозамбик","Мапуту",-25.97,32.57,"af","Бейра,Нампула,Келимане","","","Mozambique"],
+[716,"Зимбабве","Хараре",-17.83,31.05,"af","Булавайо,Мутаре","","","Zimbabwe"],
+[72,"Ботсвана","Габороне",-24.65,25.91,"af","Франсистаун,Маун","","","Botswana"],
+[516,"Намибия","Виндхук",-22.56,17.08,"af","Уолфиш-Бей,Свакопмунд","","","Namibia"],
+[710,"ЮАР","Претория",-25.75,28.19,"af","Йоханнесбург,Дурбан,Порт-Элизабет","Кейптаун,Блумфонтейн","В ЮАР три столицы: Претория (исполнительная), Кейптаун (законодательная) и Блумфонтейн (судебная).","South Africa"],
+[426,"Лесото","Масеру",-29.31,27.48,"af","Тейатеянг,Мафетенг","","","Lesotho"],
+[748,"Эсватини","Мбабане",-26.31,31.14,"af","Манзини,Сителеки","Ломба","Бывший Свазиленд. Административная столица — Мбабане, королевская и законодательная — Ломба.","eSwatini|Eswatini|Swaziland"],
+[450,"Мадагаскар","Антананариву",-18.88,47.51,"af","Туамасина,Анцирабе,Махадзанга","","","Madagascar"],
+[480,"Маврикий","Порт-Луи",-20.16,57.50,"af","Кюрпип,Роз-Хилл","","","Mauritius"],
+[690,"Сейшельские Острова","Виктория",-4.62,55.45,"af","","","","Seychelles"],
+[174,"Коморы","Морони",-11.70,43.26,"af","Мутсаму,Фомбони","","","Comoros"],
+[678,"Сан-Томе и Принсипи","Сан-Томе",0.34,6.73,"af","Санту-Антониу","","","São Tomé and Principe|Sao Tome and Principe|São Tomé and Príncipe"],
+
+// ───────── СЕВЕРНАЯ И ЦЕНТРАЛЬНАЯ АМЕРИКА ─────────
+[840,"США","Вашингтон",38.90,-77.04,"na","Нью-Йорк,Лос-Анджелес,Чикаго,Сан-Франциско","","Вашингтон, округ Колумбия — не путать со штатом Вашингтон на западе страны.","United States of America|United States"],
+[124,"Канада","Оттава",45.42,-75.70,"na","Торонто,Монреаль,Ванкувер,Квебек","","","Canada"],
+[484,"Мексика","Мехико",19.43,-99.13,"na","Гвадалахара,Монтеррей,Канкун,Пуэбла","","","Mexico"],
+[320,"Гватемала","Гватемала",14.63,-90.51,"na","Кесальтенанго,Антигуа-Гватемала","","Столица называется так же, как страна.","Guatemala"],
+[84,"Белиз","Бельмопан",17.25,-88.77,"na","Белиз,Сан-Игнасио","","Бельмопан стал столицей в 1970 году, после того как ураган разрушил город Белиз.","Belize"],
+[340,"Гондурас","Тегусигальпа",14.07,-87.19,"na","Сан-Педро-Сула,Ла-Сейба","","","Honduras"],
+[222,"Сальвадор","Сан-Сальвадор",13.69,-89.22,"na","Санта-Ана,Сан-Мигель","","","El Salvador"],
+[558,"Никарагуа","Манагуа",12.11,-86.24,"na","Леон,Гранада,Масая","","","Nicaragua"],
+[188,"Коста-Рика","Сан-Хосе",9.93,-84.08,"na","Лимон,Алахуэла,Картаго","","","Costa Rica"],
+[591,"Панама","Панама",8.98,-79.52,"na","Колон,Давид","","Столица называется так же, как страна.","Panama"],
+[192,"Куба","Гавана",23.11,-82.37,"na","Сантьяго-де-Куба,Камагуэй,Варадеро","","","Cuba"],
+[388,"Ямайка","Кингстон",18.00,-76.79,"na","Монтего-Бей,Спаниш-Таун","","Не путать с Кингстауном — столицей Сент-Винсента и Гренадин.","Jamaica"],
+[332,"Гаити","Порт-о-Пренс",18.59,-72.31,"na","Кап-Аитьен,Гонаив","","","Haiti"],
+[214,"Доминиканская Республика","Санто-Доминго",18.49,-69.93,"na","Сантьяго-де-лос-Кабальерос,Пунта-Кана","","Не путать с Доминикой — отдельным островным государством.","Dominican Rep.|Dominican Republic"],
+[44,"Багамские Острова","Нассау",25.05,-77.35,"na","Фрипорт","","","Bahamas|The Bahamas"],
+[780,"Тринидад и Тобаго","Порт-оф-Спейн",10.65,-61.51,"na","Сан-Фернандо,Скарборо","","","Trinidad and Tobago"],
+[52,"Барбадос","Бриджтаун",13.10,-59.61,"na","Спейтстаун","","","Barbados"],
+[308,"Гренада","Сент-Джорджес",12.06,-61.75,"na","Гренвилл","","","Grenada"],
+[662,"Сент-Люсия","Кастри",14.01,-60.99,"na","Вьё-Фор","","","Saint Lucia|St. Lucia"],
+[670,"Сент-Винсент и Гренадины","Кингстаун",13.16,-61.22,"na","","","Не путать с Кингстоном — столицей Ямайки.","St. Vin. and Gren.|Saint Vincent and the Grenadines"],
+[212,"Доминика","Розо",15.30,-61.39,"na","Портсмут","","Не путать с Доминиканской Республикой.","Dominica"],
+[28,"Антигуа и Барбуда","Сент-Джонс",17.12,-61.85,"na","Кодрингтон","","","Antigua and Barb.|Antigua and Barbuda"],
+[659,"Сент-Китс и Невис","Бастер",17.30,-62.72,"na","Чарлстаун","","","St. Kitts and Nevis|Saint Kitts and Nevis"],
+
+// ───────── ЮЖНАЯ АМЕРИКА ─────────
+[76,"Бразилия","Бразилиа",-15.79,-47.88,"sa","Рио-де-Жанейро,Сан-Паулу,Манаус,Ресифи","","Бразилиа построена как новая столица в 1960 году; до этого столицей был Рио-де-Жанейро.","Brazil"],
+[32,"Аргентина","Буэнос-Айрес",-34.60,-58.38,"sa","Кордова,Росарио,Мендоса","","","Argentina"],
+[152,"Чили","Сантьяго",-33.45,-70.67,"sa","Вальпараисо,Консепсьон,Антофагаста","","","Chile"],
+[604,"Перу","Лима",-12.05,-77.04,"sa","Куско,Арекипа,Трухильо","","","Peru"],
+[68,"Боливия","Сукре",-19.05,-65.26,"sa","Санта-Крус-де-ла-Сьерра,Кочабамба,Потоси","Ла-Пас","Конституционная столица — Сукре; правительство и парламент находятся в Ла-Пасе.","Bolivia"],
+[218,"Эквадор","Кито",-0.18,-78.47,"sa","Гуаякиль,Куэнка","","","Ecuador"],
+[170,"Колумбия","Богота",4.71,-74.07,"sa","Медельин,Кали,Картахена","","","Colombia"],
+[862,"Венесуэла","Каракас",10.48,-66.90,"sa","Маракайбо,Баркисимето,Мерида","","","Venezuela"],
+[328,"Гайана","Джорджтаун",6.80,-58.16,"sa","Линден,Нью-Амстердам","","","Guyana"],
+[740,"Суринам","Парамарибо",5.85,-55.20,"sa","Ниуве-Никкери,Ленсдорп","","","Suriname"],
+[858,"Уругвай","Монтевидео",-34.90,-56.16,"sa","Пунта-дель-Эсте,Сальто,Пайсанду","","","Uruguay"],
+[600,"Парагвай","Асунсьон",-25.26,-57.58,"sa","Сьюдад-дель-Эсте,Энкарнасьон","","","Paraguay"],
+
+// ───────── ОКЕАНИЯ ─────────
+[36,"Австралия","Канберра",-35.28,149.13,"oc","Сидней,Мельбурн,Брисбен,Перт","","Канберру построили специально как компромисс между соперничавшими Сиднеем и Мельбурном.","Australia"],
+[554,"Новая Зеландия","Веллингтон",-41.29,174.78,"oc","Окленд,Крайстчерч,Куинстаун","","Окленд — крупнейший город, но столица — Веллингтон.","New Zealand"],
+[598,"Папуа — Новая Гвинея","Порт-Морсби",-9.44,147.18,"oc","Лаэ,Маунт-Хаген","","","Papua New Guinea"],
+[242,"Фиджи","Сува",-18.14,178.44,"oc","Нанди,Лаутока","","","Fiji"],
+[90,"Соломоновы Острова","Хониара",-9.43,159.95,"oc","Гизо,Ауки","","","Solomon Is.|Solomon Islands"],
+[548,"Вануату","Порт-Вила",-17.73,168.32,"oc","Луганвиль","","","Vanuatu"],
+[882,"Самоа","Апиа",-13.83,-171.76,"oc","Салелолога","Паго-Паго","","Samoa"],
+[776,"Тонга","Нукуалофа",-21.14,-175.20,"oc","Неиафу","","","Tonga"],
+[296,"Кирибати","Южная Тарава",1.33,172.98,"oc","Бетио","","Столица расположена на атолле Тарава.","Kiribati"],
+[798,"Тувалу","Фунафути",-8.52,179.20,"oc","","","","Tuvalu"],
+[520,"Науру","Ярен",-0.55,166.92,"oc","","","Официальной столицы нет; правительство находится в округе Ярен.","Nauru"],
+[584,"Маршалловы Острова","Маджуро",7.09,171.38,"oc","Эбейе","","","Marshall Is.|Marshall Islands"],
+[583,"Микронезия","Паликир",6.92,158.16,"oc","Колониа,Вено","","Федеративные Штаты Микронезии.","Micronesia|Federated States of Micronesia"],
+[585,"Палау","Нгерулмуд",7.50,134.62,"oc","Корор","","С 2006 года столица — Нгерулмуд; до этого — Корор.","Palau"]
+];
+
+/* Территории на карте, которые не входят в список вопросов (непризнанные, спорные, зависимые) */
+const TERRITORY_NAMES = {
+  "greenland":"Гренландия (автономия в составе Дании)",
+  "wsahara":"Западная Сахара (спорная территория)",
+  "westernsahara":"Западная Сахара (спорная территория)",
+  "kosovo":"Косово (частично признанное государство)",
+  "taiwan":"Тайвань",
+  "ncyprus":"Северный Кипр (непризнанное государство)",
+  "northerncyprus":"Северный Кипр (непризнанное государство)",
+  "somaliland":"Сомалиленд (непризнанное государство)",
+  "falklandis":"Фолклендские (Мальвинские) острова",
+  "falklandislands":"Фолклендские (Мальвинские) острова",
+  "puertorico":"Пуэрто-Рико (США)",
+  "newcaledonia":"Новая Каледония (Франция)",
+  "frpolynesia":"Французская Полинезия",
+  "frenchpolynesia":"Французская Полинезия",
+  "hongkong":"Гонконг (Китай)",
+  "macao":"Макао (Китай)",
+  "faeroeis":"Фарерские острова (Дания)",
+  "faroeislands":"Фарерские острова (Дания)",
+  "aland":"Аландские острова (Финляндия)",
+  "frsantarcticlands":"Французские Южные территории",
+  "antarctica":"Антарктида",
+  "bermuda":"Бермудские острова (Великобритания)",
+  "caymanis":"Каймановы острова (Великобритания)",
+  "aruba":"Аруба (Нидерланды)",
+  "curacao":"Кюрасао (Нидерланды)",
+  "sintmaarten":"Синт-Мартен (Нидерланды)",
+  "stmartin":"Сен-Мартен (Франция)",
+  "stbarthelemy":"Сен-Бартелеми (Франция)",
+  "guam":"Гуам (США)",
+  "nmarianais":"Северные Марианские острова (США)",
+  "americansamoa":"Американское Самоа (США)",
+  "usvirginis":"Виргинские острова (США)",
+  "britishvirginis":"Британские Виргинские острова",
+  "turksandcaicosis":"Тёркс и Кайкос (Великобритания)",
+  "montserrat":"Монтсеррат (Великобритания)",
+  "anguilla":"Ангилья (Великобритания)",
+  "isleofman":"Остров Мэн (Великобритания)",
+  "jersey":"Джерси (Великобритания)",
+  "guernsey":"Гернси (Великобритания)",
+  "niue":"Ниуэ",
+  "cookis":"Острова Кука",
+  "wallisandfutunais":"Уоллис и Футуна (Франция)",
+  "pitcairnis":"Острова Питкэрн (Великобритания)",
+  "sainthelena":"Остров Святой Елены (Великобритания)",
+  "sgeoandtheis":"Южная Георгия (Великобритания)",
+  "heardiandmcdonaldis":"Острова Херд и Макдональд (Австралия)",
+  "brindianoceanter":"Британская территория в Индийском океане",
+  "indianoceanter":"Острова Рождества и Кокосовые (Австралия)",
+  "norfolkisland":"Остров Норфолк (Австралия)",
+  "stpierreandmiquelon":"Сен-Пьер и Микелон (Франция)",
+  "siachenglacier":"Ледник Сиачен (спорная территория)",
+  "ashmoreandcartieris":"Острова Ашмор и Картье (Австралия)",
+  "baikonur":"Байконур (арендован Россией у Казахстана)",
+  "cyprusnomansarea":"Буферная зона ООН на Кипре",
+  "usminoroutlyingis":"Внешние малые острова (США)"
+};
+
+/* Ассоциации для запоминания столиц. Ключ — ISO-номер страны.
+   **так** выделяются созвучные кусочки. */
+const MNEMONICS = {
+// ───────── Европа ─────────
+643:"Москва не сразу строилась, а ты её сразу знаешь. Тут без подсказок 🙂",
+804:"Торт «**Киев**ский» — самый известный сувенир из столицы Украины.",
+112:"Зимой в Беларуси **мин**ус — все греются в **Мин**ске.",
+616:"Поляки **вар**ят **ша**урму — в **Вар-ша**-ве.",
+276:"На гербе **Бер**лина — медведь (по-немецки Bär, «бер»).",
+250:"Спорим на **пари**, что Эйфелева башня — в **Пари**же? Выиграешь.",
+826:"Биг-Бен над Темзой бьёт: «**Лон**-**дон**, **Лон**-**дон**!»",
+372:"В **дуб**овых бочках ирландский виски катят в **Дуб**лин.",
+724:"**Мад**ам **рид**ает (рыдает) на корриде — **Мадрид**.",
+620:"По порту гуляет **лиса** с **бан**тиком — **Лисса**-**бон**.",
+380:"Все дороги ведут в **Рим**.",
+528:"Страна дамб — и столица Амстер-**дам** (dam — «дамба»). А правительство сидит в Гааге.",
+56:"**Брюссель**ская капуста — родом из Бельгии.",
+442:"Тут всё люкс: и страна, и столица — **Люксембург**.",
+756:"Швейцарский банк **бер**ежно **бер**ёт деньги на хранение — **Бер**н. Не Цюрих и не Женева!",
+40:"**Вен**ский вальс и **вен**ские стулья — из Австрии. Не путай с Австралией!",
+438:"Альпийская **водиц**а течёт в **Вадуц**.",
+492:"Как Люксембург: страна **Монако** — столица **Монако**. Монте-Карло — лишь район с казино.",
+20:"**Андорра** + «ла-Велья» (по-каталански «старая») = Старая Андорра.",
+674:"**Сан-Марино** в **Сан-Марино** — без сюрпризов.",
+336:"Папа римский живёт в **Ватикан**е — это и страна, и город.",
+470:"На Мальте **лет**ом жара **вал**ит с ног — **Вал**-**лет**-та.",
+208:"Русалочка Андерсена сидит на камне у моря в **Копенгаген**е.",
+578:"Норвежский **осёл** катится на лыжах по фьорду — **Осло**.",
+752:"Швед лупит по мячу: «**Сток**! **Гол**!» — **Сток**-**гол**ьм.",
+246:"Финн выходит из сауны: «**Хел**ло!» — **Хель**синки.",
+352:"**Рейкьявик** = «дымящаяся бухта»: над Исландией дымят гейзеры.",
+233:"Вокруг Старого города **Тал**лина — **длин**ные-**длин**ные средневековые стены.",
+428:"Шпроты «**Риж**ские» — латвийские. Латвия → **Рига**.",
+440:"Литва — **Виль**нюс. Раньше город так и звали — **Виль**но.",
+203:"Карлов мост и **Праж**ский торт — это **Праг**а.",
+703:"Словаки и чехи — братья: **Брат**и-слава — «слава брату».",
+348:"Два берега Дуная: **Буда** и **Пешт**. Венгр гуляет из **Буды** **пеш**ком.",
+642:"Граф Дракула из Румынии **бух**ал кровь, пока не попал под **арест** — **Бух**-**арест**.",
+498:"Молдавский изюм-**киш**миш сушат в **Киш**инёве.",
+100:"**София** — «мудрость»: мудрые болгары и болгарский перец.",
+300:"Богиня **Афин**а охраняет **Афин**ы.",
+8:"В Албании правит **тиран** — **Тиран**а.",
+807:"Александр Македонский с **копь**ём — с**копь**е.",
+688:"Сербы построили «белый город» — **Бел**-**град**.",
+499:"Горы Черногории чёрные, а столица — **под горой**: **Под**-**гор**ица.",
+70:"Боснийский **сара**й — **Сара**ево. Здесь в 1914 году началась Первая мировая.",
+191:"Хорваты **греб**ут к морю — **За**-**греб**ай!",
+705:"В слове s**LOVE**nia спрятано «love» — значит столица **Любл**-яна (люблю!).",
+
+// ───────── Азия ─────────
+792:"Ангорские кошки и козы — из **Анкар**ы (её старое имя — Ангора). Не Стамбул!",
+196:"Грек **Никос** с Кипра — **Никос**ия.",
+268:"«Тбили» по-грузински — «тёплый»: в **Тбили**си горячие серные бани.",
+51:"Армянское радио спрашивают: «Где **Ереван**?» Отвечают: «В Армении, конечно!»",
+31:"Азербайджанская нефть — в **бак**! **Бак**у.",
+398:"«**Астана**» по-казахски — просто «столица». Так и запомни.",
+860:"Узбекский плов **тащ**ат в **Таш**кент («каменный город»).",
+795:"Туркмен на ахалтекинском коне: «**Ах**! **Ах**!» — **Аш**-**ха**-бад.",
+417:"Киргиз ест **беш**бармак с **кек**сом — **Биш**-**кек**.",
+762:"**Душанбе** по-таджикски значит «понедельник» — в этот день был большой базар.",
+4:"**Кабы** не горы Гиндукуша, **Кабу**л было бы видно издалека.",
+586:"Исламская Республика Пакистан — **Ислам**абад («город ислама»). Не Карачи!",
+356:"В Индии **нью**-столица: **Нью**-Дели строили рядом со старым Дели.",
+524:"Из Непала — на Эверест, а потом **кат**ишься вниз в **Кат**манду.",
+64:"В горах Бутана тихо **пых**тят монахи: «**тхим**-**пху**, **тхим**-**пху**».",
+50:"В дельте Ганга крякают утки (duck — «**дак**»): **Дак**ка.",
+144:"Самая длинная столица: «**Шри**» в начале и **кот** в конце — **Шри**-...-**Кот**те. **Кот** пьёт цейлонский чай.",
+462:"Мальдивы **мал**енькие — и столица **Мал**е.",
+156:"**Пекин**ская утка — главное блюдо Китая.",
+496:"Монгольский **батыр** (богатырь) — **Улан**-**Батор**, «красный богатырь».",
+408:"Две Кореи: «**С**еул — **С**амсунг» на юге. Значит, на севере — **Пхеньян**.",
+410:"Южная Корея — это **С**амсунг, K-pop и **С**еул.",
+392:"**Токио** и **Киото** — из одних и тех же слогов! Столица — **Токио**, Киото — бывшая.",
+704:"Вьетнамский перец: «**Ох**, **хана**! **Ой**!» — **Ханой**.",
+418:"Лаос — сосед Вьетнама, и столица звучит похоже: **Вьен**тьян.",
+116:"В джунглях Камбоджи — **пень** на **пне**: **Пном**-**пень**.",
+764:"Тайский кокос падает на голову — **БАНГ**! **кок**ос! — **Банг**-**кок**.",
+104:"Новую столицу строили так долго, что «**не пьём до** открытия» — **Нейпьидо**. Раньше столицей был Янгон.",
+458:"**Коал**а на **лампе**: **Куала**-**Лумп**ур. Коал там нет — зато башни Петронас.",
+702:"Город-государство: **Сингапур** — он же столица.",
+360:"Пират **Джек** ищет Индонезию по **карт**е — **Джа**-**карт**а.",
+96:"У султана Брунея **банда** **сер**ых котов **бега**ет по золотым **ванн**ам — **Бандар**-**Сери**-**Бега**-**ван**.",
+608:"Филиппинские острова **ман**ят — **Ман**ила.",
+626:"Остров Тимор по**дели**ли на восток и запад — **Дили**.",
+364:"Рифма: Ир**ан** — Тегер**ан**.",
+368:"Али-Баба и «Тысяча и одна ночь» — это **Багдад**.",
+760:"**Дамаск**ая сталь — знаменитые мечи из Сирии.",
+422:"**Лив**ень в **Лив**ане **бьёт** по крышам — **Бей**рут.",
+376:"Святой город трёх религий — **Иерусалим**.",
+275:"Палестина провозглашает столицей **Восточный** **Иерусалим**, а правительство работает в Рамалле.",
+400:"Река Иорд**ан** — и столица Амм**ан**: рифма на «-ан».",
+682:"В пустыне — **ряд** нефтяных вышек: **Эр**-**Рияд**.",
+887:"Йеменский кофе мокко пьют в **сана**тории — **Сана**.",
+512:"Оманский **мускат** — сладкий виноград: **Маскат**.",
+784:"Дубай богатый, но столица — **Абу**-**Даби**: «**Абу**, **дай** **бы** денег!»",
+634:"В катарской жаре **дох**нуть можно — **Доха**.",
+48:"«**Ма**-**на**-**ма**!» — кричит малыш с острова Бахрейн.",
+414:"Просто добавь «Эль»: **Кувейт** → Эль-**Кувейт**.",
+
+// ───────── Африка ─────────
+818:"Верблюд у пирамид: «**Кай**ф! **Ир**а, фоткай!» — **Каир**.",
+434:"В ливийской пустыне — **три** **пол**я: **Три**-**пол**и.",
+788:"Как Алжир: **Тунис** — столица **Тунис**а.",
+12:"Как Тунис: **Алжир** — столица **Алжир**а.",
+504:"**Раб**отает правительство в **Раб**ате, а Касабланка — для кино.",
+478:"Мавританец в пустыне: «**Ну**, **а** **что**?» — **Нуакшот**.",
+466:"В Мали: «**Бам**! **Мак**ака!» — **Бамак**о.",
+562:"«**Ни**» и «**Ни**»: **Ни**гер — **Ни**амей.",
+148:"Мама в Чаде: «**Чад**о, **джем** **на**!» — **Н**-**джаме**-**на**.",
+729:"**Хартум** стоит там, где сливаются Белый и Голубой Нил, — как хобот слона (так переводят название).",
+728:"Самая молодая страна мира (2011): от радости все танцуют «**джу**-**ба**, **джу**-**ба**» — **Джуба**.",
+231:"**Аддис**-**Абеба** — «новый цветок». Эфиопия — родина кофе: пей и повторяй «А-ддис-А-беба».",
+232:"«**Ас**, **мэр**!» — так приветствуют мэра в Эритрее: **Асм**э**ра**.",
+262:"**Джибути** — столица **Джибути**. Повторяй дважды, не ошибёшься.",
+706:"Сомалийский пират ныряет: «Не **мог**у **дыш**ать!» — **Могадиш**о.",
+404:"На кенийском сафари **най**ди **Роби**нзона — **Най**-**роби**.",
+800:"В Уганде **кам**ень **пал** в озеро Виктория — **Кам**-**пал**а.",
+834:"После Килиманджаро — **до**мой, **до**мой! **До**-**дом**-а. Не Дар-эс-Салам!",
+646:"Гориллы в Руанде кричат: «**Ки**-**га**-**ли**!»",
+108:"**Бу**рун**ду**к играет на **гит**аре — **Гит**ега.",
+180:"Большое Конго — **Кин**шаса («**кинг**» — король). Маленькое — Браззавиль.",
+178:"Маленький **брат** большого Конго — **Бра**ззавиль. Столицы стоят друг напротив друга через реку.",
+266:"**Либревиль** — по-французски «свободный город» (libre ville).",
+226:"**Сьюдад**-**де**-**ла**-**Пас** — «Город мира» по-испански. Новая столица с 2026 года, Малабо — бывшая.",
+120:"«**Я**, **unde**rstand!» — понял: столица Камеруна **Яунде**, а не Дуала.",
+140:"Царь Центральной Африки (ЦАР) бьёт в **бонг**и — **Банг**и.",
+566:"«**А** **будь** я столицей?» — спросил город, и Лагос уступил **Абудж**е.",
+204:"Бенину нужен **новый** **порт** — **Порто**-**Ново**. Правительство при этом сидит в Котону.",
+768:"«**Того**… **ло**мается!» — маленькое Того, столица **Ло**ме.",
+288:"Ганский шоколад: «**А**, **кра**сота!» — **Акк**ра.",
+384:"Слон с Берега Слоновой Кости: «**Я** **му**-**су** **кро**шу бивнем!» — **Ямусукро**.",
+854:"Четыре удара в барабан: «**Уа**! **Га**! **Ду**! **Гу**!» — **Уагадугу**.",
+430:"**Монров**ия названа в честь президента США Джеймса **Монро**.",
+694:"**Фритаун** — «свободный город» (free town): основан для освобождённых рабов.",
+324:"В Гвинее **кон**ь на **кри**к бежит — **Кон**а**кри**.",
+624:"Гвинея-**Бисау** — вторая половина названия и есть столица: **Бисау**.",
+686:"Ралли «Париж — **Дакар**» финиширует в Сенегале.",
+270:"В Гамбии играют на **бан**джо — **Бан**жул.",
+132:"«**Прая**» по-португальски — «пляж». Острова Кабо-Верде — сплошной пляж.",
+24:"Ан**гол**а — **Луан**да. Не путай с Руандой — это вообще отдельная страна!",
+894:"Замбиец несёт **лу**к в **сак**е (мешке) — **Лу**-**сак**а.",
+454:"«It's a **long** **way** to Malawi» — **Лилонгв**е.",
+508:"На **map**-е (карте) Мозамбика — **пут**ь к океану: **Ма**-**пут**у.",
+716:"Зимбабве смеётся: «**Ха**-**ра**-**ре**!» — **Хараре**.",
+72:"«**Габор**, **one** (один)!» — один Габор на всю Калахари: **Габорон**е.",
+516:"В пустыне Намиб — ветер (**wind**) и крюк (**hook**): **Виндхук**.",
+710:"В ЮАР три столицы: **Пре**тория — для **пре**зидента, Кейптаун — для парламента, Блумфонтейн — для суда.",
+426:"Горная страна Лесото: **ма**сса **сер**ых скал — **Масе**ру.",
+748:"В Эсватини **баба** в **бане** — **М**-**баба**-**не**.",
+450:"Лемуры Мадагаскара поют: «**Ан**-**та**-**на**-**на**-**ри**-**ву**!»",
+480:"В **порт** заходит мавр по имени **Луи** — **Порт**-**Луи** на **Мавр**икии.",
+690:"Отпуск на Сейшелах — полная **Виктория** (победа)!",
+174:"**Ком**ары над **мор**ем — **Мор**они, Коморы.",
+678:"**Сан**-**Томе** и Принсипи — бери первую половину: **Сан**-**Томе**.",
+
+// ───────── Северная и Центральная Америка ─────────
+840:"Первый президент США — Джордж **Вашингтон**. Не путай со штатом Вашингтон!",
+124:"Кленовый сироп **отта**ивает весной — **Отта**ва. Не Торонто!",
+484:"По-испански сама страна называется México — **Мехико**.",
+320:"**Гватемала** — столица **Гватемалы**. Повторяй дважды.",
+84:"На **бел**ом **мо**педе — в **Бель**-**мо**-**пан**. Белиз — это бывшая столица, а не страна-город.",
+340:"«Тебя Гондурас беспокоит?» — «Нет, меня беспокоит **Тегу**-**си**-**гальпа**!»",
+222:"**Сальвадор** + святой = **Сан**-**Сальвадор**.",
+558:"Рифма: Никар**агуа** — Ман**агуа**.",
+188:"«Богатый берег» Коста-Рика и святой **Хосе** — **Сан**-**Хосе**.",
+591:"Как Панамский канал — так и столица: **Панама**.",
+192:"**Гаван**ские сигары — с Кубы.",
+388:"Король регги (**King**) Боб Марли — с Ямайки: **Кинг**стон.",
+332:"**Порт**-**о**-**Пренс** — «порт принца» (prince).",
+214:"Святой **Доминик** дал имя и стране, и столице: Санто-**Доминго**.",
+44:"Багамы **нас** **ау**кают на пляж — **Насс**-**ау**!",
+780:"**Порт**-**оф**-**Спейн** — «испанский порт»: Тринидад открыли испанцы.",
+52:"**Бриджтаун** — «город у моста» (bridge town).",
+308:"Святой **Георгий** бросает **гранат**у (Гренада) — **Сент**-**Джорджес**.",
+662:"**Люс**я жарит шашлык на **кост**ре — **Каст**ри.",
+670:"«Королевский город» (**King**’s **town**) — **Кингстаун**. Не путай с Кингстоном на Ямайке!",
+212:"**Роз**овая Доминика — **Роз**о.",
+28:"На Антигуа молится святой **Джон** — **Сент**-**Джонс**.",
+659:"**Кит**-**бастер** (громила) приплыл на Сент-**Китс** — **Бастер**.",
+
+// ───────── Южная Америка ─────────
+76:"**Бразилиа** — как страна, только на «-а». Не Рио и не Сан-Паулу!",
+32:"**Буэнос**-**Айрес** — «добрые ветра» (хороший воздух).",
+152:"Яго ест острый перец **чили** — **Сант**-**ьяго**.",
+604:"В Перу **лам**ы гуляют по **Лим**е.",
+68:"Сладкая Боливия: **Сукре** — почти «сахар» (sucre). А правительство — в Ла-Пасе.",
+218:"На экваторе плавает **кит** — **Кит**о.",
+170:"Колумбийский кофе — **бога**тый вкус: **Бого**та.",
+862:"Венесуэльский попугай орёт: «**Ка**-**ра**-**кас**!»",
+328:"**Джорджтаун** — «город Джорджа»: Гайана была британской.",
+740:"На **пар**оме **Мари** **бо**сиком — **Пара**-**мари**-**бо**.",
+858:"**Монтевидео** — «вижу гору» (monte video).",
+600:"Сиеста в Парагвае: «**Ась**? **Сон**!» — **Асунсьон**.",
+
+// ───────── Австралия и Океания ─────────
+36:"**Кан**гуру ест **берри** (ягоды) — **Кан**-**берр**а. Не Сидней!",
+554:"Говядина «**Веллингтон**» — а Окленд просто самый большой город.",
+598:"Папуа: **порт** у **мор**я — **Порт**-**Морс**би.",
+242:"**Сув**енир с Фиджи — **Сув**а.",
+90:"Мёд (**honey**) царя Соломона — **Хони**ара.",
+548:"**Ваню**-**ту** везут в **порт** на **вилл**у — **Порт**-**Вила**.",
+882:"Сам**оа** — **А**пи**а**: оба слова кончаются на «а».",
+776:"«**Ну**, **коала**, **офи**геть!» — **Нукуалофа**, Тонга.",
+296:"На Кирибати **тара**банят в барабан — **Тара**ва (Южная).",
+798:"Тувалу уходит под воду **фут** за **фут**ом — **Фунафут**и.",
+520:"«**Я** **рен**тую весь остров!» — крошечная Науру, **Ярен**.",
+584:"**Маршал** на **мажор**е — **Маджуро**.",
+583:"Микро-страна, микро-**палк**а: **Пали**кир.",
+585:"«**Не** **грусти**, **муд**рец!» — **Нгерулмуд**, Палау."
+};
+
+
+/* ═════════ Константы и данные ═════════ */
+const D2R = Math.PI / 180;
+const S = 160;            // масштаб проекции (мировые единицы)
+const LON0 = 10.7;        // центральный меридиан
+const SEAM = -169.3;      // шов карты в Беринговом проливе, чтобы Океания не разрывалась
+const TOP_LAT = 85, BOT_LAT = -60;
+const DATA_URLS = [
+  'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json',
+  'https://unpkg.com/world-atlas@2/countries-50m.json',
+  'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
+];
+const REGIONS = [
+  { id: 'all', name: 'Весь мир' },
+  { id: 'eu', name: 'Европа', view: [-25, 33, 62, 71.5] },
+  { id: 'as', name: 'Азия', view: [25, -11, 150, 56] },
+  { id: 'af', name: 'Африка', view: [-26, -36, 60, 38] },
+  { id: 'na', name: 'Северная и Центральная Америка', view: [-170, 6, -50, 74] },
+  { id: 'sa', name: 'Южная Америка', view: [-95, -56, -30, 13] },
+  { id: 'oc', name: 'Австралия и Океания', view: [110, -48, 191, 14] }
+];
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#star"/></svg>';
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Telegram Mini App: объект есть, только если страницу открыли из Telegram
+const TG = (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) ? Telegram.WebApp : null;
+const tgv = v => !!(TG && TG.isVersionAtLeast && TG.isVersionAtLeast(v));
+const BOOKMARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.6L7 20z"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const XICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]/g, '');
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+const COUNTRIES = COUNTRIES_RAW.map((r, i) => ({
+  i, iso: r[0], name: r[1], cap: r[2], lat: r[3], lon: r[4],
+  reg: r[5].split(' '), traps: r[6] ? r[6].split(',') : [],
+  excl: new Set(r[7] ? r[7].split(',') : []), note: r[8],
+  ne: r[9].split('|').map(norm), feats: [], dot: null, p: r[0] % 5, near: [],
+  mn: (typeof MNEMONICS !== 'undefined' && MNEMONICS[r[0]]) || ''
+}));
+const BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.7 10.7c.7.6 1.2 1.4 1.2 2.3h5c0-.9.5-1.7 1.2-2.3A6 6 0 0 0 12 3z"/></svg>';
+const mnHtml = c => c.mn ? BULB + '<span>' + esc(c.mn).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>') + '</span>' : '';
+const TERR = {};
+for (const k in TERRITORY_NAMES) TERR[k] = TERRITORY_NAMES[k];
+TERR.cyprusunbufferzone = 'Буферная зона ООН на Кипре';
+
+function hav(a, b) {
+  const dl = (b.lat - a.lat) * D2R, dn = (b.lon - a.lon) * D2R;
+  const x = Math.sin(dl / 2) ** 2 + Math.cos(a.lat * D2R) * Math.cos(b.lat * D2R) * Math.sin(dn / 2) ** 2;
+  return 2 * Math.asin(Math.sqrt(x));
+}
+for (const c of COUNTRIES) {
+  c.near = COUNTRIES.filter(o => o !== c).map(o => [o, hav(c, o)]).sort((a, b) => a[1] - b[1]).slice(0, 12).map(x => x[0]);
+}
+
+/* ═════════ Проекция Natural Earth ═════════ */
+function P(lon, lat) {
+  const l = (lon - LON0) * D2R, p = lat * D2R, p2 = p * p, p4 = p2 * p2;
+  return [
+    S * l * (0.8707 - 0.131979 * p2 + p4 * (-0.013791 + p4 * (0.003971 * p2 - 0.001529 * p4))),
+    -S * p * (1.007226 + p2 * (0.015085 + p4 * (-0.044475 + 0.028874 * p2 - 0.005916 * p4)))
+  ];
+}
+const wrapLon = lon => lon < SEAM ? lon + 360 : lon;
+const capPt = c => P(wrapLon(c.lon), c.lat);
+function geoBox(w, s, e, n) {
+  const b = [Infinity, Infinity, -Infinity, -Infinity];
+  for (let i = 0; i <= 12; i++) {
+    const lon = w + (e - w) * i / 12;
+    for (const lat of [s, n, (s + n) / 2]) { const q = P(lon, lat); grow(b, q[0], q[1]); }
+  }
+  return b;
+}
+function grow(b, x, y) { if (x < b[0]) b[0] = x; if (y < b[1]) b[1] = y; if (x > b[2]) b[2] = x; if (y > b[3]) b[3] = y; }
+
+/* ═════════ Состояние ═════════ */
+const svg = $('#map'), gWorld = $('#world'), gLands = $('#lands'), gDots = $('#dots'), gHi = $('#hilite');
+const overlay = $('#overlay'), tip = $('#tip');
+const FEATS = [];
+let WB;                  // границы мира
+const cam = { x: 0, y: 0, k: 1 };
+let W = innerWidth, H = innerHeight, kMin = .5, kMax = 100, kFit = 1;
+const labels = new Set();
+let screen = 'loading';
+const st = {
+  region: 'all', mode: 'both', size: '20', roundRegion: 'all',
+  queue: [], qi: 0, cur: null, phase: null, tries: 0, maxTries: 3, wrong: 0,
+  cands: null, candAll: null, narrow: 0,
+  mapOk: null, capOk: null, opts: [], results: [], pool: null, lastPool: null
+};
+
+/* ═════════ Прогресс ═════════ */
+// STATS[iso] = { l: уровень 0–3 (выучена при 2+), o: верных, e: ошибок, k: что было не так ('m' карта, 'c' столица), t: время }
+// FLAGS[iso] = { t: когда отмечена, pl: уровень до отметки }
+const LS = 'konturka-v1', LSF = 'konturka-flags';
+let STATS = {}, FLAGS = {};
+try { STATS = JSON.parse(localStorage.getItem(LS)) || {}; } catch (e) { STATS = {}; }
+try { FLAGS = JSON.parse(localStorage.getItem(LSF)) || {}; } catch (e) { FLAGS = {}; }
+let MN_MODE = 'always', SEEN_HELP = false;
+try { MN_MODE = localStorage.getItem('konturka-mn') || 'always'; SEEN_HELP = localStorage.getItem('konturka-help') === '1'; } catch (e) {}
+function saveLocal() {
+  try {
+    localStorage.setItem(LS, JSON.stringify(STATS));
+    localStorage.setItem(LSF, JSON.stringify(FLAGS));
+    localStorage.setItem('konturka-mn', MN_MODE);
+    localStorage.setItem('konturka-help', SEEN_HELP ? '1' : '0');
+  } catch (e) {}
+}
+function saveAll() { saveLocal(); cloudPush(); }
+const lvl = c => (STATS[c.iso] && STATS[c.iso].l) || 0;
+const learned = c => lvl(c) >= 2;
+const flagged = c => !!FLAGS[c.iso];
+const seen = c => !!STATS[c.iso] && ((STATS[c.iso].o | 0) + (STATS[c.iso].e | 0)) > 0;
+const weak = c => !flagged(c) && !!STATS[c.iso] && STATS[c.iso].e > 0 && STATS[c.iso].l < 2;
+function record(c, ok, kind) {
+  const s = STATS[c.iso] || (STATS[c.iso] = { l: 0, o: 0, e: 0 });
+  if (ok) { s.l = Math.min(3, s.l + 1); s.o++; } else { s.l = 0; s.e++; s.k = kind || ''; }
+  s.t = Date.now();
+  if (ok && FLAGS[c.iso] && s.l >= 2) delete FLAGS[c.iso];   // отмеченную выучил — снимаем отметку
+  saveAll();
+}
+function setFlag(c, on) {
+  const s = STATS[c.iso];
+  if (on) {
+    FLAGS[c.iso] = { t: Date.now(), pl: s ? s.l : 0 };
+    if (s) s.l = 0;                                          // «не знал» — значит, не выучена
+  } else {
+    const f = FLAGS[c.iso];
+    delete FLAGS[c.iso];
+    if (f && s && (!s.t || !f.t || s.t <= f.t)) s.l = f.pl || 0; // сняли сразу — возвращаем как было
+  }
+  saveAll();
+}
+
+// Облако Telegram: прогресс доступен на всех устройствах пользователя.
+// Компактно: «iso:уровень.верных.ошибок.что», чтобы влезть в 4096 символов на ключ.
+const CLOUD = tgv('6.9') && TG.CloudStorage ? TG.CloudStorage : null;
+const encStats = () => Object.keys(STATS).filter(k => seen({ iso: k })).map(k => {
+  const s = STATS[k];
+  return `${k}:${s.l | 0}.${Math.min(s.o | 0, 9999)}.${Math.min(s.e | 0, 9999)}.${s.k || ''}`;
+}).join(',');
+function decStats(str) {
+  const o = {};
+  for (const p of str.split(',')) {
+    const m = /^(\d+):(\d)\.(\d+)\.(\d+)\.([mc]*)$/.exec(p);
+    if (m) o[m[1]] = { l: +m[2], o: +m[3], e: +m[4], k: m[5] };
+  }
+  return o;
+}
+const encFlags = () => Object.keys(FLAGS).map(k => `${k}:${(FLAGS[k] && FLAGS[k].pl) | 0}`).join(',') || '-';
+function decFlags(str) {
+  const o = {};
+  for (const p of str.split(',')) { const m = /^(\d+):(\d)$/.exec(p); if (m) o[m[1]] = { t: 0, pl: +m[2] }; }
+  return o;
+}
+let cloudTimer = 0;
+function cloudPush() {
+  if (!CLOUD) return;
+  clearTimeout(cloudTimer);
+  cloudTimer = setTimeout(() => {
+    try {
+      CLOUD.setItem('p', encStats());
+      CLOUD.setItem('f', encFlags());
+      CLOUD.setItem('s', `mn=${MN_MODE};h=${SEEN_HELP ? 1 : 0}`);
+    } catch (e) {}
+  }, 600);
+}
+function cloudPull(done) {
+  if (!CLOUD) { done(false); return; }
+  let over = false;
+  const fin = changed => { if (!over) { over = true; done(changed); } };
+  setTimeout(() => fin(false), 4000);
+  try {
+    CLOUD.getItems(['p', 'f', 's'], (err, v) => {
+      if (err || !v) return fin(false);
+      let changed = false;
+      if (v.p) {
+        const cs = decStats(v.p);
+        for (const k in cs) {
+          const a = STATS[k], b = cs[k];
+          if (!a || b.o + b.e > (a.o | 0) + (a.e | 0)) { STATS[k] = b; changed = true; }
+        }
+      }
+      if (v.f) { FLAGS = v.f === '-' ? {} : decFlags(v.f); changed = true; }
+      if (v.s) {
+        const m = /mn=(\w+)/.exec(v.s);
+        if (m) MN_MODE = m[1];
+        if (/h=1/.test(v.s)) SEEN_HELP = true;
+      }
+      saveLocal();
+      if (!v.p) cloudPush();                                   // первый запуск в Telegram — отправим то, что есть
+      fin(changed);
+    });
+  } catch (e) { fin(false); }
+}
+
+/* ═════════ Telegram: тема, вибрация ═════════ */
+function applyTheme() {
+  const dark = TG ? TG.colorScheme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  if (TG) {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--page').trim();
+    try {
+      if (tgv('6.9')) { TG.setHeaderColor(bg); TG.setBackgroundColor(bg); }
+      if (tgv('7.10')) TG.setBottomBarColor(bg);
+    } catch (e) {}
+  }
+}
+function hap(kind) {
+  if (!tgv('6.1') || !TG.HapticFeedback) return;
+  try {
+    if (kind === 'success' || kind === 'error' || kind === 'warning') TG.HapticFeedback.notificationOccurred(kind);
+    else if (kind === 'select') TG.HapticFeedback.selectionChanged();
+    else TG.HapticFeedback.impactOccurred(kind || 'light');
+  } catch (e) {}
+}
+function askConfirm(msg, cb) {
+  if (tgv('6.2')) { try { TG.showConfirm(msg, ok => { if (ok) cb(); }); return; } catch (e) {} }
+  if (confirm(msg)) cb();
+}
+
+/* ═════════ Загрузка и построение карты ═════════ */
+async function loadTopo() {
+  for (const u of DATA_URLS) {
+    try { const r = await fetch(u); if (r.ok) return await r.json(); } catch (e) {}
+  }
+  throw new Error('map');
+}
+
+function build(topo) {
+  const tf = topo.transform;
+  const arcs = topo.arcs.map(arc => {
+    let x = 0, y = 0;
+    return arc.map(p => tf ? (x += p[0], y += p[1], [x * tf.scale[0] + tf.translate[0], y * tf.scale[1] + tf.translate[1]]) : p);
+  });
+  const ringPts = ring => {
+    const out = [];
+    for (const a of ring) {
+      let pts = a >= 0 ? arcs[a] : arcs[~a].slice().reverse();
+      if (out.length) pts = pts.slice(1);
+      for (const p of pts) out.push(p);
+    }
+    return out;
+  };
+  const byIso = new Map(COUNTRIES.map(c => [c.iso, c]));
+  const byName = new Map();
+  COUNTRIES.forEach(c => c.ne.forEach(n => byName.set(n, c)));
+  const arcOwners = new Map();
+  const obj = topo.objects.countries || topo.objects[Object.keys(topo.objects)[0]];
+
+  obj.geometries.forEach(g => {
+    if (!g.arcs) return;
+    const name = (g.properties && g.properties.name) || '';
+    const nn = norm(name);
+    if (nn === 'antarctica') return;
+    const idn = g.id != null ? parseInt(g.id, 10) : NaN;
+    const c = byIso.get(idn) || byName.get(nn) || null;
+    const polys = g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : [];
+    let d = '', bestA = -1, main = null, maxDiag = 0;
+    const rings = [];
+    const bb = [Infinity, Infinity, -Infinity, -Infinity];
+    for (const poly of polys) poly.forEach((ring, ri) => {
+      const pts = ringPts(ring);
+      if (pts.length < 3) return;
+      // Контуры, пересекающие 180-й меридиан (Чукотка, Фиджи, Алеутские острова), «разворачиваем»:
+      // долгота меняется непрерывно (179° → 185°), без скачка на −175°.
+      const ul = new Array(pts.length);
+      let off = 0, ml = 0;
+      for (let j = 0; j < pts.length; j++) {
+        if (j) {
+          const dl = pts[j][0] + off - ul[j - 1];
+          if (dl > 180) off -= 360; else if (dl < -180) off += 360;
+        }
+        ul[j] = pts[j][0] + off; ml += ul[j];
+      }
+      ml /= pts.length;
+      let sh = 0;
+      while (ml + sh < SEAM) sh += 360;
+      while (ml + sh >= SEAM + 360) sh -= 360;
+      let s = '', lx = 1e9, ly = 1e9, n = 0, area = 0, fx = 0, fy = 0;
+      const rb = [Infinity, Infinity, -Infinity, -Infinity];
+      for (let j = 0; j < pts.length; j++) {
+        const p = pts[j];
+        const q = P(ul[j] + sh, p[1]);
+        if (Math.abs(q[0] - lx) + Math.abs(q[1] - ly) < 0.02) continue;
+        if (n) area += lx * q[1] - q[0] * ly; else { fx = q[0]; fy = q[1]; }
+        s += (n ? 'L' : 'M') + q[0].toFixed(2) + ',' + q[1].toFixed(2);
+        lx = q[0]; ly = q[1]; n++; grow(rb, q[0], q[1]);
+      }
+      if (n < 3) return;
+      area = Math.abs(area + lx * fy - fx * ly) / 2;
+      d += s + 'Z';
+      grow(bb, rb[0], rb[1]); grow(bb, rb[2], rb[3]);
+      if (ri === 0) {
+        rings.push({ b: rb, a: area });
+        maxDiag = Math.max(maxDiag, Math.hypot(rb[2] - rb[0], rb[3] - rb[1]));
+        if (area > bestA) { bestA = area; main = rb; }
+      }
+    });
+    if (!d) return;
+    const fi = FEATS.length;
+    FEATS.push({ d, c: c ? c.i : -1, terr: c ? null : (TERR[nn] || name), bbox: bb, main, area: bestA, maxDiag, rings, col: 0 });
+    if (c) c.feats.push(fi);
+    const flat = []; (function f(a) { for (const x of a) Array.isArray(x) ? f(x) : flat.push(x < 0 ? ~x : x); })(g.arcs);
+    for (const a of flat) { let l = arcOwners.get(a); if (!l) arcOwners.set(a, l = []); if (l[l.length - 1] !== fi) l.push(fi); }
+  });
+
+  // Раскраска «политической карты»: соседи (общие границы) — разными цветами
+  const nb = FEATS.map(() => new Set());
+  arcOwners.forEach(l => { for (const a of l) for (const b of l) if (a !== b) nb[a].add(b); });
+  const order = FEATS.map((_, i) => i).sort((a, b) => nb[b].size - nb[a].size);
+  const col = new Array(FEATS.length).fill(-1);
+  for (const i of order) {
+    const used = new Set([...nb[i]].map(j => col[j]));
+    const start = (FEATS[i].c >= 0 ? COUNTRIES[FEATS[i].c].iso : i) % 5;
+    col[i] = start;
+    for (let t = 0; t < 5; t++) { const k = (start + t) % 5; if (!used.has(k)) { col[i] = k; break; } }
+  }
+  FEATS.forEach((f, i) => { f.col = col[i]; if (f.c >= 0) { const c = COUNTRIES[f.c]; if (c.feats[0] === i) c.p = col[i]; } });
+
+  // SVG: страны
+  let html = '';
+  FEATS.forEach((f, i) => {
+    html += `<path class="c p${f.c >= 0 ? COUNTRIES[f.c].p : f.col}${f.c < 0 ? ' terr' : ''}" data-f="${i}" d="${f.d}"/>`;
+  });
+  gLands.innerHTML = html;
+  const els = gLands.children;
+  FEATS.forEach((f, i) => { f.el = els[i]; });
+
+  // Маленькие и островные государства — кружок на месте столицы
+  let dh = '';
+  const dotList = [];
+  for (const c of COUNTRIES) {
+    const maxD = Math.max(0, ...c.feats.map(fi => FEATS[fi].maxDiag));
+    if (!c.feats.length || maxD < 3.2) {
+      const q = capPt(c);
+      dh += `<g class="dot p${c.p}" data-c="${c.i}"><circle class="hit" cx="${q[0].toFixed(2)}" cy="${q[1].toFixed(2)}" r="2"/><circle class="d" cx="${q[0].toFixed(2)}" cy="${q[1].toFixed(2)}" r="1"/></g>`;
+      dotList.push(c);
+    }
+  }
+  gDots.innerHTML = dh;
+  dotList.forEach((c, j) => { c.dot = gDots.children[j]; });
+
+  // Море и градусная сетка
+  const frame = [];
+  for (let t = -180; t <= 180; t += 5) frame.push(P(LON0 + t, TOP_LAT));
+  for (let lat = TOP_LAT; lat >= BOT_LAT; lat -= 5) frame.push(P(LON0 + 180, lat));
+  for (let t = 180; t >= -180; t -= 5) frame.push(P(LON0 + t, BOT_LAT));
+  for (let lat = BOT_LAT; lat <= TOP_LAT; lat += 5) frame.push(P(LON0 - 180, lat));
+  $('#sea').setAttribute('d', 'M' + frame.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L') + 'Z');
+  WB = [Infinity, Infinity, -Infinity, -Infinity];
+  frame.forEach(q => grow(WB, q[0], q[1]));
+  let gd = '';
+  for (let m = -150; m <= 180; m += 30) {
+    const pts = []; for (let lat = BOT_LAT; lat <= TOP_LAT; lat += 2.5) pts.push(P(m, lat));
+    gd += 'M' + pts.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L');
+  }
+  for (let lat = -60; lat <= 80; lat += 20) {
+    const pts = []; for (let t = -180; t <= 180; t += 5) pts.push(P(LON0 + t, lat));
+    gd += 'M' + pts.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L');
+  }
+  $('#grid').setAttribute('d', gd);
+
+  REGIONS.forEach(r => { r.box = r.view ? geoBox(...r.view) : WB.slice(); });
+}
+
+/* ═════════ Камера ═════════ */
+let raf = 0, lastK = -1;
+function schedule() { if (!raf) raf = requestAnimationFrame(render); }
+function render() {
+  raf = 0;
+  gWorld.setAttribute('transform', `translate(${cam.x.toFixed(2)} ${cam.y.toFixed(2)}) scale(${cam.k.toFixed(5)})`);
+  if (cam.k !== lastK) {
+    lastK = cam.k;
+    const rh = 9 / cam.k, rd = 4.6 / cam.k;
+    for (const c of COUNTRIES) if (c.dot) { c.dot.firstChild.setAttribute('r', rh); c.dot.lastChild.setAttribute('r', rd); }
+    const hs = 6 / cam.k, pat = $('#hatch');
+    pat.setAttribute('width', hs); pat.setAttribute('height', hs);
+    pat.firstElementChild.setAttribute('width', hs); pat.firstElementChild.setAttribute('height', hs);
+    const ln = pat.lastElementChild; ln.setAttribute('y2', hs); ln.setAttribute('stroke-width', 2 / cam.k);
+  }
+  for (const l of labels) l.el.style.transform = `translate(${(l.x * cam.k + cam.x).toFixed(1)}px,${(l.y * cam.k + cam.y).toFixed(1)}px) ${l.off}`;
+}
+function setCam(x, y, k, clampIt) {
+  cam.k = clamp(k, kMin, kMax); cam.x = x; cam.y = y;
+  if (clampIt) {
+    const m = Math.min(W, H) * .25;
+    const x0 = WB[0] * cam.k + cam.x, x1 = WB[2] * cam.k + cam.x, y0 = WB[1] * cam.k + cam.y, y1 = WB[3] * cam.k + cam.y;
+    if (x1 < m) cam.x += m - x1; if (x0 > W - m) cam.x -= x0 - (W - m);
+    if (y1 < m) cam.y += m - y1; if (y0 > H - m) cam.y -= y0 - (H - m);
+  }
+  schedule();
+}
+function zoomAt(px, py, f) {
+  const k2 = clamp(cam.k * f, kMin, kMax);
+  const wx = (px - cam.x) / cam.k, wy = (py - cam.y) / cam.k;
+  setCam(px - wx * k2, py - wy * k2, k2, true);
+}
+function pads() {
+  const p = { t: 16, b: 16, l: 16, r: 66 };
+  const q = $('#qcard'), sh = $('#sheet'), at = $('#atlasCard');
+  if (!q.hidden) p.t = q.getBoundingClientRect().bottom + 14;
+  if (!sh.hidden) p.b = H - sh.getBoundingClientRect().top + 14;
+  if (!at.hidden) p.b = Math.max(p.b, H - at.getBoundingClientRect().top + 14);
+  if (W <= 720) p.r = 16;
+  if (H - p.t - p.b < 120) { p.b = Math.max(16, H - p.t - 120); }
+  return p;
+}
+let anim = 0;
+function flyTo(box, maxK, dur = 750) {
+  cancelAnimationFrame(anim);
+  const p = pads();
+  const aw = Math.max(60, W - p.l - p.r), ah = Math.max(60, H - p.t - p.b);
+  const bw = Math.max(box[2] - box[0], 1e-3), bh = Math.max(box[3] - box[1], 1e-3);
+  const k1 = clamp(Math.min(aw / bw, ah / bh), kMin, maxK || kMax);
+  const ax = p.l + aw / 2, ay = p.t + ah / 2;
+  const w1 = [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2];
+  const k0 = cam.k, w0 = [(ax - cam.x) / k0, (ay - cam.y) / k0];
+  if (reduceMotion || dur === 0) { setCam(ax - w1[0] * k1, ay - w1[1] * k1, k1); return; }
+  const t0 = performance.now();
+  const step = now => {
+    let t = Math.min(1, (now - t0) / dur);
+    t = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const k = Math.exp(Math.log(k0) + (Math.log(k1) - Math.log(k0)) * t);
+    const wx = w0[0] + (w1[0] - w0[0]) * t, wy = w0[1] + (w1[1] - w0[1]) * t;
+    cam.k = k; cam.x = ax - wx * k; cam.y = ay - wy * k; render();
+    if (t < 1) anim = requestAnimationFrame(step);
+  };
+  anim = requestAnimationFrame(step);
+}
+function resize() {
+  W = innerWidth; H = innerHeight;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  if (!WB) return;
+  kFit = Math.min(W / (WB[2] - WB[0]), H / (WB[3] - WB[1]));
+  kMin = kFit * .45; kMax = kFit * 90;
+  schedule();
+}
+function boxOf(id) { return (REGIONS.find(r => r.id === id) || REGIONS[0]).box; }
+// Какой регион показывать: в игре — регион раунда, в настройке — выбранный, иначе весь мир
+function regionBox() { return boxOf(screen === 'quiz' || screen === 'end' ? st.roundRegion : screen === 'setup' ? st.region : 'all'); }
+// Рамка страны: основная территория (без далёких мелких островов), для маленьких — точка столицы
+function countryBox(c) {
+  const q = capPt(c);
+  const box = [q[0], q[1], q[0], q[1]];
+  if (c.dot) return box;
+  const rs = [];
+  for (const fi of c.feats) for (const r of FEATS[fi].rings) rs.push(r);
+  const maxA = Math.max(0, ...rs.map(r => r.a));
+  for (const r of rs) if (r.a >= maxA * .25) { grow(box, r.b[0], r.b[1]); grow(box, r.b[2], r.b[3]); }
+  return box;
+}
+function padBox(box, min) {
+  const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
+  const w = Math.max(box[2] - box[0], min) * 1.15, h = Math.max(box[3] - box[1], min * .62) * 1.15;
+  return [cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2];
+}
+function focusBox(c, min = 34) { return padBox(countryBox(c), min); }
+
+/* ═════════ Метки ═════════ */
+function addLabel(x, y, html, cls, off, ttl) {
+  const el = document.createElement('div');
+  el.className = 'lbl ' + cls; el.innerHTML = html;
+  overlay.appendChild(el);
+  const l = { x, y, el, off };
+  labels.add(l); schedule();
+  if (ttl) setTimeout(() => removeLabel(l), ttl);
+  return l;
+}
+function removeLabel(l) { if (labels.has(l)) { labels.delete(l); l.el.remove(); } }
+function clearLabels() { for (const l of [...labels]) removeLabel(l); }
+function capLabel(c) {
+  const q = capPt(c);
+  return addLabel(q[0], q[1], STAR + esc(c.cap), 'cap-lbl', 'translate(-12px,-50%)');
+}
+
+/* ═════════ Покраска стран ═════════ */
+function eachEl(c, fn) { c.feats.forEach(fi => fn(FEATS[fi].el)); if (c.dot) fn(c.dot); }
+function setState(c, state) {
+  eachEl(c, el => { el.classList.remove('done', 'missed', 'target', 'flag'); if (state) el.classList.add(state); });
+}
+function clearMap() {
+  clearChoice();
+  for (const f of FEATS) f.el.classList.remove('done', 'missed', 'target', 'flag', 'sel', 'flash-bad');
+  for (const c of COUNTRIES) if (c.dot) c.dot.classList.remove('done', 'missed', 'target', 'flag', 'sel', 'flash-bad');
+  gHi.innerHTML = '';
+}
+
+/* ═════════ Выбор из 7 подсвеченных стран ═════════ */
+// Кандидаты — страны рядом с нужной. Центр группы иногда сдвигаем на соседа,
+// чтобы правильный ответ не всегда оказывался посередине.
+function pickCands(c, n = 7) {
+  const anchor = Math.random() < .3 ? c : c.near[Math.random() * 4 | 0];
+  const rest = COUNTRIES.filter(o => o !== c).sort((a, b) => hav(anchor, a) - hav(anchor, b));
+  return [c, ...rest.slice(0, n - 1)];
+}
+function enterChoice() {
+  const c = st.cur;
+  const all = pickCands(c);
+  st.candAll = all; st.cands = new Set(all.map(o => o.i));
+  st.narrow = 2;
+  st.tries = 0; st.maxTries = 2; renderTries();
+  document.body.className = 'quiz locate choice';
+  $('#qPrompt').textContent = 'Какая из подсвеченных?';
+  $('#btnHint').hidden = true; $('#btnGiveUp').hidden = false;
+  let box = null;
+  for (const o of all) {
+    eachEl(o, el => el.classList.add('cand'));
+    if (!o.dot) ring(o, 'cand-ring').dataset.c = o.i;
+    const b = countryBox(o);
+    if (!box) box = b.slice(); else { grow(box, b[0], b[1]); grow(box, b[2], b[3]); }
+  }
+  flyTo(padBox(box, 28), kFit * 22, 750);
+}
+function dropCand(o) {
+  if (!st.cands) return;
+  st.cands.delete(o.i);
+  const all = st.candAll;
+  const rp = gHi.querySelector(`.cand-ring[data-c="${o.i}"]`);
+  if (rp) rp.remove();
+  setTimeout(() => { if (st.candAll === all) eachEl(o, el => el.classList.remove('cand')); }, 600);
+}
+function clearChoice() {
+  if (st.candAll) for (const o of st.candAll) eachEl(o, el => el.classList.remove('cand'));
+  gHi.querySelectorAll('.cand-ring').forEach(p => p.remove());
+  st.cands = null; st.candAll = null;
+}
+function renderTries() {
+  $('#qTries').innerHTML = Array.from({ length: st.maxTries }, (_, i) => `<i${i < st.tries ? ' class="used"' : ''}></i>`).join('');
+}
+function ring(c, cls) {
+  let d = c.feats.map(fi => FEATS[fi].d).join('');
+  if (c.dot) {
+    const q = capPt(c), r = 9 / cam.k;
+    d += `M${q[0] - r},${q[1]}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0`;
+  }
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  p.setAttribute('d', d); if (cls) p.setAttribute('class', cls);
+  gHi.appendChild(p);
+  if (cls === 'okring') setTimeout(() => p.remove(), 1100);
+  return p;
+}
+function flashBad(target) {
+  const els = [];
+  if (target.c != null) eachEl(COUNTRIES[target.c], el => els.push(el));
+  else if (target.f != null) els.push(FEATS[target.f].el);
+  els.forEach(el => { el.classList.add('flash-bad'); setTimeout(() => el.classList.remove('flash-bad'), 650); });
+}
+
+/* ═════════ Экраны ═════════ */
+const PAGES = ['home', 'setup', 'help'];
+function show(name) {
+  screen = name;
+  for (const k of PAGES) $('#' + k).hidden = name !== k;
+  $('#qcard').hidden = name !== 'quiz';
+  $('#sheet').hidden = true;
+  $('#end').hidden = name !== 'end';
+  $('#atlasCard').hidden = name !== 'atlas';
+  $('#zoom').hidden = name === 'loading';
+  tip.hidden = true;
+  document.body.className = name;
+  if (PAGES.includes(name)) $('#' + name).scrollTop = 0;
+  if (tgv('6.1')) { try { if (name === 'home' || name === 'loading') TG.BackButton.hide(); else TG.BackButton.show(); } catch (e) {} }
+  if (tgv('6.2')) { try { if (name === 'quiz') TG.enableClosingConfirmation(); else TG.disableClosingConfirmation(); } catch (e) {} }
+}
+function onBack() { if (screen !== 'home' && screen !== 'loading') goHome(); }
+const plural = (n, one, few, many) => {
+  const a = n % 10, b = n % 100;
+  return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many;
+};
+const kindLabel = k => k === 'm' ? 'карта' : k === 'c' ? 'столица' : k === 'mc' ? 'карта и столица' : '';
+
+/* Кабинет */
+let homeTab = 'err', homeMore = false;
+function goHome() {
+  cancelAnimationFrame(anim);
+  show('home'); clearLabels(); clearMap();
+  renderHome();
+}
+function repLists() {
+  const errs = COUNTRIES.filter(weak).sort((a, b) => (STATS[b.iso].t || 0) - (STATS[a.iso].t || 0));
+  const flags = COUNTRIES.filter(flagged).sort((a, b) => (FLAGS[b.iso].t || 0) - (FLAGS[a.iso].t || 0));
+  return { errs, flags };
+}
+function renderHome() {
+  const total = COUNTRIES.length;
+  const nL = COUNTRIES.filter(learned).length;
+  const nW = COUNTRIES.filter(c => !learned(c) && (seen(c) || flagged(c))).length;
+  const nN = total - nL - nW;
+  const user = TG && TG.initDataUnsafe && TG.initDataUnsafe.user;
+  $('#hello').hidden = !(user && user.first_name);
+  if (user && user.first_name) $('#hello').textContent = `Привет, ${user.first_name}!`;
+  $('#bigLine').textContent = nL
+    ? `Знаешь ${nL} ${plural(nL, 'страну', 'страны', 'стран')} из ${total}`
+    : nW ? `Учишь ${nW} ${plural(nW, 'страну', 'страны', 'стран')} из ${total}`
+    : `Впереди ${total} ${plural(total, 'страна', 'страны', 'стран')} и столиц`;
+  $('#pbar').innerHTML = (nL ? `<i class="l" style="width:${(nL / total * 100).toFixed(2)}%"></i>` : '') +
+    (nW ? `<i class="w" style="width:${(nW / total * 100).toFixed(2)}%"></i>` : '');
+  $('#stats').innerHTML = [
+    [nL, plural(nL, 'выучена', 'выучены', 'выучено'), 'var(--hero-l)'],
+    [nW, 'учишь', 'var(--hero-w)'],
+    [nN, 'впереди', 'var(--hero-track)']
+  ].map(([n, t, col]) => `<div class="stat"><b>${n}</b><span><i style="background:${col}"></i>${t}</span></div>`).join('');
+
+  const { errs, flags } = repLists();
+  $('#nErr').textContent = errs.length; $('#nFlag').textContent = flags.length;
+  $('#tabErr').setAttribute('aria-selected', homeTab === 'err');
+  $('#tabFlag').setAttribute('aria-selected', homeTab === 'flag');
+  const list = homeTab === 'err' ? errs : flags, LIM = 6;
+  $('#tabNote').hidden = !list.length;
+  $('#tabNote').textContent = homeTab === 'err'
+    ? 'Страны, где ты ошибся на карте или со столицей. Нажми на страну, чтобы посмотреть её в атласе.'
+    : 'Страны, которые ты отметил кнопкой «Не знал», например если угадал наугад. Нажми на страну, чтобы посмотреть её в атласе.';
+  const shown = homeMore ? list : list.slice(0, LIM);
+  $('#rList').innerHTML = shown.map(c => {
+    const tag = homeTab === 'err' ? kindLabel(STATS[c.iso].k) : '';
+    return `<li><button class="rrow" data-c="${c.i}"><span class="sw ${homeTab}"></span>` +
+      `<span class="rname">${esc(c.name)}</span><span class="rcap">${esc(c.cap)}</span>` +
+      (tag ? `<span class="rtag">${tag}</span>` : '') + `</button>` +
+      (homeTab === 'flag' ? `<button class="rdel" data-un="${c.i}" aria-label="Убрать «${esc(c.name)}» из списка «Не знал»" title="Убрать из списка">${XICON}</button>` : '') +
+      `</li>`;
+  }).join('');
+  $('#rEmpty').hidden = list.length > 0;
+  $('#rEmpty').textContent = homeTab === 'err'
+    ? 'Пока пусто: ошибок не было. Сыграй раунд, и страны, на которых ошибёшься, появятся здесь.'
+    : 'Пока пусто. Угадал страну наугад? После ответа жми «Не знал», и она появится здесь.';
+  $('#rMore').hidden = list.length <= LIM;
+  $('#rMore').textContent = homeMore ? 'Свернуть' : `Показать все ${list.length}`;
+  $('#btnPractice').hidden = !list.length;
+  $('#btnPractice').textContent = `Тренировать ${list.length} ${plural(list.length, 'страну', 'страны', 'стран')}`;
+
+  const C2 = 2 * Math.PI * 19;
+  $('#homeRegions').innerHTML = REGIONS.filter(r => r.id !== 'all').map(r => {
+    const l = COUNTRIES.filter(c => c.reg.includes(r.id)), n = l.filter(learned).length, f = n / l.length;
+    return `<li><button data-reg="${r.id}"><span class="ring"><svg viewBox="0 0 48 48" aria-hidden="true">` +
+      `<circle class="tr" cx="24" cy="24" r="19"/>` +
+      (n ? `<circle class="fl" cx="24" cy="24" r="19" stroke-dasharray="${(f * C2).toFixed(1)} ${C2.toFixed(1)}"/>` : '') +
+      `</svg><em>${Math.round(f * 100)}%</em></span>` +
+      `<span><span class="rn">${r.name}</span><span class="rc">${n} из ${l.length}</span></span></button></li>`;
+  }).join('');
+  $('#storeNote').textContent = CLOUD
+    ? 'Прогресс хранится в Telegram и доступен на всех твоих устройствах.'
+    : 'Прогресс хранится в этом браузере.';
+}
+function drawTopo() {
+  // Изолинии, как на топографической карте: два «холма» из вложенных неровных колец
+  const w = 420, h = 260, el = $('#topo');
+  el.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  el.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+  let out = '';
+  for (const [cx, cy, n, ph] of [[w * .9, h * .2, 10, 1.1], [w * .04, h * 1.08, 9, 2.4]]) {
+    for (let k = 1; k <= n; k++) {
+      const r = k * 15;
+      let d = '';
+      for (let a = 0; a <= 72; a++) {
+        const t = a / 72 * Math.PI * 2;
+        const rr = r * (1 + .12 * Math.sin(3 * t + k * .55 + ph) + .06 * Math.sin(5 * t - k * .8));
+        d += (a ? 'L' : 'M') + (cx + rr * 1.45 * Math.cos(t)).toFixed(1) + ',' + (cy + rr * .85 * Math.sin(t)).toFixed(1);
+      }
+      out += `<path d="${d}Z"/>`;
+    }
+  }
+  el.innerHTML = out;
+}
+
+/* Новая игра */
+function openSetup(reg) {
+  if (reg) st.region = reg;
+  show('setup'); clearLabels(); clearMap();
+  renderRegions();
+  for (const [seg, val] of [['#modeSeg', st.mode], ['#sizeSeg', st.size], ['#mnSeg', MN_MODE]]) {
+    const r = document.querySelector(`${seg} input[value="${val}"]`); if (r) r.checked = true;
+  }
+}
+function renderRegions() {
+  $('#regions').innerHTML = REGIONS.map(r => {
+    const list = r.id === 'all' ? COUNTRIES : COUNTRIES.filter(c => c.reg.includes(r.id));
+    const n = list.filter(learned).length;
+    return `<label class="reg"><input type="radio" name="region" value="${r.id}"${r.id === st.region ? ' checked' : ''}>
+      <span class="rb"></span><span class="rn">${r.name}</span><span class="rc">${n} из ${list.length}</span>
+      <span class="bar"><i style="width:${(n / list.length * 100).toFixed(1)}%"></i></span></label>`;
+  }).join('');
+}
+
+/* Как играть */
+function openHelp() {
+  SEEN_HELP = true; saveAll();
+  show('help'); clearLabels(); clearMap();
+}
+
+/* ═════════ Раунд ═════════ */
+function poolFor(region) { return region === 'all' ? COUNTRIES.slice() : COUNTRIES.filter(c => c.reg.includes(region)); }
+function startRound(pool, sizeOverride, region) {
+  const size = sizeOverride || st.size;
+  st.roundRegion = region || st.region;
+  const arr = pool.map(c => ({ c, w: lvl(c) + Math.random() * 1.6 }));
+  arr.sort((a, b) => a.w - b.w);
+  const n = size === 'all' ? arr.length : Math.min(+size, arr.length);
+  st.lastPool = pool;
+  st.queue = shuffle(arr.slice(0, n).map(a => ({ c: a.c, repeat: false })));
+  st.qi = 0; st.results = [];
+  clearMap(); clearLabels();
+  show('quiz');
+  nextQuestion(true);
+}
+function nextQuestion(first) {
+  clearLabels(); gHi.innerHTML = '';
+  if (st.qi >= st.queue.length) return endRound();
+  const item = st.queue[st.qi];
+  const c = st.cur = item.c;
+  clearChoice();
+  st.tries = 0; st.maxTries = 3; st.wrong = 0; st.mapOk = null; st.capOk = null;
+  $('#sheet').hidden = true; $('#after').hidden = true;
+  $('#qRepeat').hidden = !item.repeat;
+  $('#qName').textContent = c.name;
+  $('#qStatus').textContent = ''; $('#qStatus').className = '';
+  renderTries();
+  renderTicks();
+  if (st.mode === 'cap') {
+    $('#qPrompt').textContent = 'Какая столица у этой страны?';
+    $('#qTries').hidden = true; $('#btnGiveUp').hidden = true; $('#btnHint').hidden = true;
+    st.phase = 'capital';
+    setState(c, 'target');
+    document.body.className = 'quiz capphase';
+    showOptions();
+    flyTo(focusBox(c), kFit * 22);
+  } else {
+    // Ищешь сам по карте. Кнопка сужает поиск по шагам:
+    // «Сузить поиск» (приблизить район) → «Дать 7 вариантов» → «Показать, где»
+    $('#qTries').hidden = false;
+    st.phase = 'locate'; st.narrow = 0;
+    $('#qPrompt').textContent = 'Найди на карте';
+    $('#btnHint').textContent = 'Сузить поиск';
+    $('#btnHint').hidden = false; $('#btnGiveUp').hidden = true;
+    document.body.className = 'quiz locate';
+    flyTo(regionBox(), null, first ? 600 : 750);
+  }
+}
+function renderTicks() {
+  const t = $('#qTicks'), q = st.queue;
+  $('#qCount').textContent = `${Math.min(st.qi + 1, q.length)} из ${q.length}`;
+  if (q.length > 60) {
+    const done = st.qi / q.length * 100;
+    t.innerHTML = `<i class="ok" style="flex:none;width:${done}%"></i><i></i>`;
+    return;
+  }
+  t.innerHTML = q.map((it, i) => `<i class="${i < st.qi ? (it.res ? 'ok' : 'bad') : i === st.qi ? 'cur' : ''}"></i>`).join('');
+}
+
+function onTap(target, wx, wy) {
+  if (screen === 'atlas') {
+    if (target && target.c != null) atlasSelect(COUNTRIES[target.c], false);
+    else if (target && target.terr) atlasTerritory(target);
+    return;
+  }
+  if (screen !== 'quiz' || st.phase !== 'locate' || !target) return;
+  // В режиме выбора нажатия мимо подсвеченных стран не считаются
+  if (st.cands && (target.c == null || !st.cands.has(target.c))) return;
+  const c = st.cur;
+  if (target.c === c.i) {
+    st.mapOk = st.wrong === 0;
+    hap('success');
+    clearChoice();
+    setState(c, 'done');
+    ring(c, 'okring');
+    $('#qStatus').textContent = st.wrong === 0 ? 'Нашёл с первой попытки' : 'Нашёл';
+    $('#qStatus').className = 'ok';
+    afterLocate();
+  } else {
+    st.tries++; st.wrong++;
+    hap('error');
+    renderTries();
+    flashBad(target);
+    if (st.cands) dropCand(COUNTRIES[target.c]);
+    const nm = target.c != null ? COUNTRIES[target.c].name : target.terr;
+    addLabel(wx, wy, 'Это ' + esc(nm), 'bad-lbl', 'translate(-50%,-135%)', 2200);
+    if (st.tries >= st.maxTries) reveal();
+    else {
+      $('#qStatus').textContent = st.maxTries - st.tries === 1 ? 'Не то. Последняя попытка' : 'Не то. Ещё две попытки';
+      $('#qStatus').className = 'bad';
+    }
+  }
+}
+function hint() {
+  if (screen !== 'quiz' || st.phase !== 'locate' || st.cands) return;
+  $('#qStatus').textContent = ''; $('#qStatus').className = '';
+  if (st.narrow === 0) zoomArea(); else enterChoice();
+}
+// Шаг 1: приблизить район вокруг страны, ничего не подсвечивая.
+// Рамка — сама страна плюс столицы ~14 соседей; центр иногда сдвинут на соседа.
+function zoomArea() {
+  const c = st.cur;
+  st.narrow = 1;
+  const anchor = Math.random() < .3 ? c : c.near[Math.random() * 3 | 0];
+  const near = COUNTRIES.filter(o => o !== c).sort((a, b) => hav(anchor, a) - hav(anchor, b)).slice(0, 14);
+  const box = countryBox(c).slice();
+  for (const o of near) { const q = capPt(o); grow(box, q[0], q[1]); }
+  $('#qPrompt').textContent = 'Страна где-то здесь';
+  $('#btnHint').textContent = 'Дать 7 вариантов';
+  flyTo(padBox(box, 60), kFit * 14, 750);
+}
+function reveal() {
+  if (st.phase !== 'locate') return;
+  const c = st.cur;
+  st.mapOk = false;
+  hap('warning');
+  clearChoice();
+  setState(c, 'target');
+  ring(c);
+  $('#qStatus').textContent = 'Вот она';
+  $('#qStatus').className = 'bad';
+  afterLocate();
+}
+function afterLocate() {
+  const c = st.cur;
+  $('#btnGiveUp').hidden = true; $('#btnHint').hidden = true;
+  if (st.mode === 'map') {
+    st.phase = 'answered';
+    document.body.className = 'quiz capphase';
+    capLabel(c);
+    $('#sheet').hidden = false;
+    $('#sTitle').hidden = true; $('#opts').hidden = true;
+    finalize();
+    showAfter(st.mapOk, `Столица — ${c.cap}.`);
+  } else {
+    st.phase = 'capital';
+    document.body.className = 'quiz capphase';
+    $('#qPrompt').textContent = 'Теперь — столица';
+    showOptions();
+  }
+  requestAnimationFrame(() => flyTo(focusBox(c), kFit * 22));
+}
+function makeOptions(c) {
+  const bad = new Set([c.cap, ...c.excl]), used = new Set(), out = [];
+  const add = s => { if (!s || bad.has(s) || used.has(s)) return; used.add(s); out.push(s); };
+  const traps = shuffle(c.traps.slice());
+  const nT = traps.length >= 2 ? (Math.random() < .5 ? 2 : 1) : traps.length;
+  for (let i = 0; i < traps.length && out.length < nT; i++) add(traps[i]);
+  for (const o of shuffle(c.near.slice(0, 8))) { if (out.length >= 4) break; add(o.cap); }
+  if (out.length < 4) for (const o of shuffle(COUNTRIES.filter(o => o !== c && o.reg.some(r => c.reg.includes(r))))) { if (out.length >= 4) break; add(o.cap); }
+  if (out.length < 4) for (const t of traps) { if (out.length >= 4) break; add(t); }
+  return shuffle([c.cap, ...out.slice(0, 4)]);
+}
+function showOptions() {
+  const c = st.cur;
+  st.opts = makeOptions(c);
+  $('#sTitle').hidden = false; $('#opts').hidden = false; $('#after').hidden = true;
+  $('#sTitle').textContent = `Столица — ${c.name}?`;
+  $('#opts').innerHTML = st.opts.map((o, i) => `<button class="opt" data-i="${i}"><kbd>${i + 1}</kbd><span>${esc(o)}</span></button>`).join('');
+  $('#sheet').hidden = false;
+}
+function choose(i) {
+  if (st.phase !== 'capital') return;
+  const c = st.cur, pick = st.opts[i];
+  st.capOk = pick === c.cap;
+  hap(st.capOk ? 'success' : 'error');
+  st.phase = 'answered';
+  [...$('#opts').children].forEach((b, j) => {
+    b.disabled = true;
+    if (st.opts[j] === c.cap) b.classList.add('ok');
+    else if (j === i) b.classList.add('bad');
+    else b.classList.add('dim');
+  });
+  capLabel(c);
+  finalize();
+  showAfter(st.capOk, st.capOk ? '' : `Столица — ${c.cap}.`);
+  requestAnimationFrame(() => flyTo(focusBox(c), kFit * 22, 450));
+}
+function showAfter(ok, extra) {
+  const c = st.cur;
+  const verdict = ok ? (st.mode === 'map' ? 'Нашёл с первой попытки' : 'Верно') : (st.mode === 'map' ? 'Запомни, где она' : 'Неверно');
+  const txt = [extra, c.note].filter(Boolean).map(esc).join(' ');
+  $('#afterText').innerHTML = `<span class="verdict ${ok ? 'ok' : 'bad'}">${verdict}</span>${txt}`;
+  const showMn = c.mn && (MN_MODE === 'always' || (MN_MODE === 'wrong' && !ok));
+  $('#mnem').hidden = !showMn;
+  $('#mnem').innerHTML = showMn ? mnHtml(c) : '';
+  $('#after').hidden = false;
+  syncFlagBtn();
+  $('#btnNext').textContent = st.qi + 1 >= st.queue.length ? 'Итоги' : 'Дальше';
+  setTimeout(() => $('#btnNext').focus({ preventScroll: true }), 30);
+}
+function finalize() {
+  const c = st.cur, item = st.queue[st.qi];
+  const ok = st.mapOk !== false && st.capOk !== false;
+  item.res = ok;
+  setState(c, ok ? 'done' : 'missed');
+  record(c, ok, (st.mapOk === false ? 'm' : '') + (st.capOk === false ? 'c' : ''));
+  if (!item.repeat) st.results.push({ c, mapOk: st.mapOk, capOk: st.capOk });
+  if (!ok && !item.repeat) {
+    const at = Math.min(st.qi + 4, st.queue.length);
+    st.queue.splice(at, 0, { c, repeat: true });
+  }
+  renderTicks();
+}
+function next() { if (st.phase !== 'answered') return; st.qi++; nextQuestion(); }
+function syncFlagBtn() {
+  const on = flagged(st.cur), b = $('#btnFlag');
+  b.setAttribute('aria-pressed', on);
+  b.title = on ? 'Убрать из списка «Не знал»' : 'Добавить в список «Не знал», чтобы потренировать отдельно';
+  b.innerHTML = (on ? CHECK : BOOKMARK) + '<span>Не знал</span>';
+}
+
+function endRound() {
+  show('end'); clearLabels(); gHi.innerHTML = '';
+  const r = st.results, n = r.length;
+  const perfect = r.filter(x => x.mapOk !== false && x.capOk !== false).length;
+  $('#endScore').innerHTML = `<b>${perfect}</b> из ${n} без ошибок`;
+  const parts = [];
+  if (st.mode !== 'cap') parts.push(`с первой попытки найдено на карте — ${r.filter(x => x.mapOk).length}`);
+  if (st.mode !== 'map') parts.push(`столиц угадано — ${r.filter(x => x.capOk).length}`);
+  const sub = parts.join(', ');
+  $('#endSub').textContent = sub.charAt(0).toUpperCase() + sub.slice(1) + '.';
+  const miss = r.filter(x => x.mapOk === false || x.capOk === false);
+  $('#endMiss').innerHTML = miss.length ? `<p class="miss-h">Стоит повторить</p><ul class="misses">${miss.map(x => {
+    const what = [x.mapOk === false ? 'карта' : '', x.capOk === false ? 'столица' : ''].filter(Boolean).join(' и ');
+    return `<li><span class="mn">${esc(x.c.name)}</span><span class="mc">${esc(x.c.cap)}</span><span class="mt">${what}</span></li>`;
+  }).join('')}</ul>` : `<p class="miss-h">Все страны раунда закрашены — отличный результат.</p>`;
+  $('#btnRetry').hidden = !miss.length;
+  st.missedPool = miss.map(x => x.c);
+  $('#endTitle').textContent = perfect === n ? 'Идеально!' : 'Раунд пройден';
+  flyTo(regionBox(), null, 700);
+}
+
+/* ═════════ Атлас ═════════ */
+let atlasSel = null;
+const ATLAS_HINT = '<p class="ahint">Нажми на страну, и я покажу её столицу и ассоциацию. Искать можно по названию страны или столицы.</p>';
+function openAtlas(c) {
+  show('atlas'); clearLabels(); clearMap();
+  $('#aInfo').innerHTML = ATLAS_HINT;
+  $('#aSearch').value = '';
+  requestAnimationFrame(() => { if (c) atlasSelect(c, true); else flyTo(boxOf('all'), null, 600); });
+}
+function atlasClearSel() {
+  if (atlasSel) { (atlasSel.els || []).forEach(el => el.classList.remove('sel')); atlasSel = null; }
+  clearLabels();
+}
+function atlasSelect(c, fly) {
+  atlasClearSel();
+  const els = []; eachEl(c, el => { el.classList.add('sel'); els.push(el); });
+  atlasSel = { els };
+  capLabel(c);
+  const regs = c.reg.map(r => REGIONS.find(x => x.id === r).name).join(', ');
+  const s = STATS[c.iso], fl = flagged(c);
+  const [sw, status] = fl ? ['flag', 'В списке «Не знал»']
+    : learned(c) ? ['done', 'Выучена']
+    : weak(c) ? ['err', `Были ошибки: ${s.e}`]
+    : seen(c) ? ['none', 'Учишь']
+    : ['none', 'Ещё не встречалась в игре'];
+  $('#aInfo').innerHTML = `<h3>${esc(c.name)}</h3><p class="acap">${STAR}<span>Столица — <b>${esc(c.cap)}</b></span></p>` +
+    `<p class="anote">${esc(regs)}${c.note ? '. ' + esc(c.note) : ''}</p>` +
+    (c.mn && MN_MODE !== 'off' ? `<div class="mnem">${mnHtml(c)}</div>` : '') +
+    `<p class="astat"><span class="sw ${sw}"></span>${status}</p>` +
+    `<button class="btn ${fl ? '' : 'flag'}" id="aFlag">${fl ? XICON : BOOKMARK}<span>${fl ? 'Убрать из «Не знал»' : 'Добавить в «Не знал»'}</span></button>`;
+  $('#aFlag').onclick = () => { setFlag(c, !flagged(c)); hap('light'); atlasSelect(c, false); };
+  if (fly) flyTo(focusBox(c), kFit * 22);
+}
+function atlasTerritory(t) {
+  atlasClearSel();
+  const el = FEATS[t.f].el; el.classList.add('sel'); atlasSel = { els: [el] };
+  $('#aInfo').innerHTML = `<h3>${esc(t.terr)}</h3><p class="anote">Не входит в список государств для тренировки.</p>`;
+}
+
+/* ═════════ Ввод: мышь, тач, клавиатура ═════════ */
+function hitAt(x, y) {
+  const el = document.elementFromPoint(x, y);
+  if (!el || !svg.contains(el)) return null;
+  const dot = el.closest && el.closest('[data-c]');
+  if (dot) return { c: +dot.dataset.c };
+  const p = el.closest && el.closest('[data-f]');
+  if (p) { const f = FEATS[+p.dataset.f]; return f.c >= 0 ? { c: f.c, f: +p.dataset.f } : { terr: f.terr, f: +p.dataset.f }; }
+  return null;
+}
+const ptrs = new Map();
+let drag = null, pinch = null;
+svg.addEventListener('pointerdown', e => {
+  if (screen === 'loading') return;
+  cancelAnimationFrame(anim);
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  try { svg.setPointerCapture(e.pointerId); } catch (_) {}
+  if (ptrs.size === 1) { drag = { sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y, moved: false }; pinch = null; }
+  else if (ptrs.size === 2) {
+    const [a, b] = [...ptrs.values()];
+    pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+    if (drag) drag.moved = true;
+  }
+  tip.hidden = true;
+});
+svg.addEventListener('pointermove', e => {
+  if (!ptrs.has(e.pointerId)) {
+    if (e.pointerType === 'mouse' && screen === 'atlas') {
+      const t = hitAt(e.clientX, e.clientY);
+      if (t) {
+        tip.textContent = t.c != null ? COUNTRIES[t.c].name : t.terr;
+        tip.hidden = false;
+        tip.style.transform = `translate(${e.clientX + 14}px,${e.clientY + 12}px)`;
+      } else tip.hidden = true;
+    }
+    return;
+  }
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (ptrs.size === 1 && drag) {
+    const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (!drag.moved && Math.hypot(dx, dy) > 6) { drag.moved = true; svg.classList.add('dragging'); }
+    if (drag.moved) setCam(drag.cx + dx, drag.cy + dy, cam.k, true);
+  } else if (ptrs.size >= 2 && pinch) {
+    const [a, b] = [...ptrs.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    cam.x += mx - pinch.mx; cam.y += my - pinch.my;
+    zoomAt(mx, my, d / (pinch.d || d));
+    pinch = { d, mx, my };
+  }
+});
+function endPtr(e) {
+  if (!ptrs.has(e.pointerId)) return;
+  const wasSingle = ptrs.size === 1;
+  ptrs.delete(e.pointerId);
+  if (wasSingle && drag && !drag.moved && e.type === 'pointerup') {
+    const t = hitAt(e.clientX, e.clientY);
+    onTap(t, (e.clientX - cam.x) / cam.k, (e.clientY - cam.y) / cam.k);
+  }
+  if (ptrs.size === 1) { const p = [...ptrs.values()][0]; drag = { sx: p.x, sy: p.y, cx: cam.x, cy: cam.y, moved: true }; pinch = null; }
+  if (!ptrs.size) { drag = null; pinch = null; svg.classList.remove('dragging'); }
+}
+svg.addEventListener('pointerup', endPtr);
+svg.addEventListener('pointercancel', endPtr);
+svg.addEventListener('pointerleave', () => { tip.hidden = true; });
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (screen === 'loading') return;
+  cancelAnimationFrame(anim);
+  const dy = e.deltaMode === 1 ? e.deltaY * 30 : e.deltaY;
+  zoomAt(e.clientX, e.clientY, Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0018)));
+}, { passive: false });
+svg.addEventListener('dblclick', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, 2); });
+
+function zoomCenter(f) {
+  const p = pads();
+  const cx = p.l + (W - p.l - p.r) / 2, cy = p.t + (H - p.t - p.b) / 2;
+  const w = [(cx - cam.x) / cam.k, (cy - cam.y) / cam.k];
+  const k = clamp(cam.k * f, kMin, kMax);
+  const half = [(W - p.l - p.r) / 2 / k, (H - p.t - p.b) / 2 / k];
+  flyTo([w[0] - half[0], w[1] - half[1], w[0] + half[0], w[1] + half[1]], null, 300);
+}
+$('#zIn').onclick = () => zoomCenter(1.8);
+$('#zOut').onclick = () => zoomCenter(1 / 1.8);
+$('#zFit').onclick = () => flyTo(regionBox());
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (screen === 'quiz') {
+    if (st.phase === 'capital' && /^[1-5]$/.test(e.key)) { e.preventDefault(); choose(+e.key - 1); }
+    else if (st.phase === 'answered' && (e.key === 'Enter' || e.key === ' ') && !(document.activeElement && document.activeElement.tagName === 'BUTTON' && document.activeElement !== $('#btnNext'))) { e.preventDefault(); next(); }
+  }
+  if (e.key === 'Escape' && screen !== 'home' && screen !== 'loading') goHome();
+  if (screen !== 'loading' && (e.key === '+' || e.key === '=')) zoomCenter(1.8);
+  if (screen !== 'loading' && (e.key === '-' || e.key === '_')) zoomCenter(1 / 1.8);
+});
+
+/* ═════════ Кнопки ═════════ */
+document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', goHome));
+// кабинет
+$('#btnNew').onclick = () => openSetup();
+$('#btnAtlas').onclick = () => openAtlas();
+$('#btnHelp').onclick = openHelp;
+$('#btnHelp2').onclick = openHelp;
+$('#btnHelpOk').onclick = goHome;
+$('#tabErr').onclick = () => { homeTab = 'err'; homeMore = false; renderHome(); hap('select'); };
+$('#tabFlag').onclick = () => { homeTab = 'flag'; homeMore = false; renderHome(); hap('select'); };
+$('#rMore').onclick = () => { homeMore = !homeMore; renderHome(); };
+$('#rList').addEventListener('click', e => {
+  const un = e.target.closest('[data-un]');
+  if (un) { setFlag(COUNTRIES[+un.dataset.un], false); renderHome(); hap('light'); return; }
+  const r = e.target.closest('.rrow');
+  if (r) openAtlas(COUNTRIES[+r.dataset.c]);
+});
+$('#btnPractice').onclick = () => {
+  const { errs, flags } = repLists();
+  const list = homeTab === 'err' ? errs : flags;
+  if (list.length) startRound(list, 'all', 'all');
+};
+$('#homeRegions').addEventListener('click', e => { const b = e.target.closest('[data-reg]'); if (b) openSetup(b.dataset.reg); });
+$('#btnReset').onclick = () => askConfirm('Сбросить весь прогресс и отмеченные страны? Это нельзя отменить.', () => {
+  STATS = {}; FLAGS = {}; saveAll(); goHome();
+});
+// новая игра
+$('#regions').addEventListener('change', e => {
+  if (e.target.name === 'region') { st.region = e.target.value; hap('select'); }
+});
+$('#modeSeg').addEventListener('change', e => { st.mode = e.target.value; hap('select'); });
+$('#sizeSeg').addEventListener('change', e => { st.size = e.target.value; hap('select'); });
+$('#mnSeg').addEventListener('change', e => { MN_MODE = e.target.value; saveAll(); hap('select'); });
+$('#btnStart').onclick = () => startRound(poolFor(st.region), null, st.region);
+// игра
+$('#btnHint').onclick = hint;
+$('#btnGiveUp').onclick = reveal;
+$('#opts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b) choose(+b.dataset.i); });
+$('#btnNext').onclick = next;
+$('#btnFlag').onclick = () => {
+  if (st.phase !== 'answered') return;
+  setFlag(st.cur, !flagged(st.cur)); syncFlagBtn(); hap('light');
+};
+$('#btnRetry').onclick = () => startRound(st.missedPool, 'all', st.roundRegion);
+$('#btnAgain').onclick = () => startRound(st.lastPool || poolFor(st.region), null, st.roundRegion);
+$('#btnEndMenu').onclick = goHome;
+// атлас
+$('#aList').innerHTML = COUNTRIES.slice().sort((a, b) => a.name.localeCompare(b.name, 'ru')).map(c => `<option value="${esc(c.name)}">`).join('');
+$('#aSearch').addEventListener('change', e => {
+  const v = e.target.value.trim().toLowerCase();
+  const c = COUNTRIES.find(c => c.name.toLowerCase() === v) || COUNTRIES.find(c => c.cap.toLowerCase() === v) ||
+    COUNTRIES.find(c => c.name.toLowerCase().startsWith(v)) || COUNTRIES.find(c => c.cap.toLowerCase().startsWith(v));
+  if (c) { atlasSelect(c, true); e.target.blur(); }
+});
+addEventListener('resize', () => { resize(); });
+
+/* ═════════ Старт ═════════ */
+if (TG) {
+  try { TG.ready(); TG.expand(); } catch (e) {}
+  if (tgv('7.7')) { try { TG.disableVerticalSwipes(); } catch (e) {} }   // свайп по карте не закрывает приложение
+  try {
+    TG.onEvent('themeChanged', applyTheme);
+    TG.onEvent('viewportChanged', () => resize());
+    if (tgv('6.1')) TG.BackButton.onClick(onBack);
+  } catch (e) {}
+} else {
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
+}
+applyTheme();
+drawTopo();
+resize();
+loadTopo().then(topo => {
+  build(topo);
+  resize();
+  const b = WB, k = kFit;
+  setCam(W / 2 - (b[0] + b[2]) / 2 * k, H / 2 - (b[1] + b[3]) / 2 * k, k);
+  render();
+  $('#loading').hidden = true;
+  goHome();
+  cloudPull(changed => {
+    if (changed && screen === 'home') renderHome();
+    if (!SEEN_HELP && screen === 'home') openHelp();
+  });
+  window.__konturka = { COUNTRIES, FEATS, cam, st, P: capPt, get STATS() { return STATS; }, get FLAGS() { return FLAGS; } };
+}).catch(() => {
+  $('#loadMsg').textContent = 'Не получилось загрузить карту. Проверь подключение к интернету и обнови страницу.';
+  $('#loadPen').hidden = true; $('#loadErr').hidden = false;
+});
+})();
+</script>
+</body>
+</html>
